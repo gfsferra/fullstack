@@ -1,0 +1,77 @@
+# =============================================================================
+# Project Root .gitignore
+# Laravel (Backend) + Vue.js (Frontend)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Laravel / PHP Backend
+# -----------------------------------------------------------------------------
+
+# Environment files
+backend/.env
+backend/.env.backup
+backend/.env.production
+
+# Vendor dependencies
+backend/vendor/
+
+# Compiled PHP
+backend/*.php.cache
+
+# Laravel specific
+backend/storage/*.key
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/logs/*
+backend/bootstrap/cache/*
+
+# PHPUnit
+backend/.phpunit.result.cache
+backend/.phpunit.cache/
+
+# Composer
+backend/composer.phar
+
+# IDE / Editor
+backend/.idea/
+backend/.vscode/
+backend/*.swp
+backend/*.swo
+
+# -----------------------------------------------------------------------------
+# Vue.js / Node.js Frontend
+# -----------------------------------------------------------------------------
+
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+frontend/dist-ssr/
+
+# Environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Editor directories and files
+frontend/.idea/
+frontend/.vscode/
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+
+# TypeScript cache
+frontend/*.tsbuildinfo
+
+# Vite
+frontend/.vite/
