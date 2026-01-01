@@ -1,54 +1,43 @@
-import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import api from '@/services/api';
+import { defineStore } from 'pinia';
+import type { AuthUser, AuthState } from '@/types';
 
-export interface AuthUser {
-  id: number;
-  name: string;
-  email: string;
-  avatar?: string;
-  registration_completed: boolean;
-}
-
+/**
+ * Store de autenticação
+ * Gerencia o estado do usuário autenticado e fluxo OAuth
+ */
 export const useAuthStore = defineStore('auth', () => {
+  // State
   const user = ref<AuthUser | null>(null);
   const loading = ref(false);
+  const error = ref<string | null>(null);
 
+  // Getters
   const isAuthenticated = computed(() => !!user.value);
-  const needsRegistration = computed(() => user.value && !user.value.registration_completed);
+  const isRegistrationComplete = computed(() => user.value?.registration_completed ?? false);
+  const needsRegistration = computed(() => isAuthenticated.value && !isRegistrationComplete.value);
 
-  function loginWithGoogle() {
-    // Redirect to Laravel's Google OAuth endpoint
-    window.location.href = 'http://localhost:8000/api/auth/google/redirect';
+  /**
+   * Inicia fluxo de login com Google
+   */
+  function loginWithGoogle(): void {
+    loading.value = true;
+    error.value = null;
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/auth/google/redirect`;
   }
 
-  function handleCallback(): boolean {
-    // Parse URL parameters after Google callback
-    const urlParams = new URLSearchParams(window.location.search);
-    const success = urlParams.get('success');
-    
-    if (success === 'true') {
-      user.value = {
-        id: parseInt(urlParams.get('user_id') || '0'),
-        name: urlParams.get('name') || '',
-        email: urlParams.get('email') || '',
-        avatar: urlParams.get('avatar') || undefined,
-        registration_completed: urlParams.get('registration_completed') === 'true',
-      };
-      
-      // Store in localStorage for persistence
-      localStorage.setItem('auth_user', JSON.stringify(user.value));
-      
-      // Clean URL
-      window.history.replaceState({}, document.title, '/');
-      
-      return true;
-    }
-    
-    return false;
+  /**
+   * Define o usuário autenticado
+   */
+  function setUser(authUser: AuthUser): void {
+    user.value = authUser;
+    localStorage.setItem('auth_user', JSON.stringify(authUser));
   }
 
-  function loadFromStorage() {
+  /**
+   * Carrega usuário do localStorage
+   */
+  function loadFromStorage(): void {
     const stored = localStorage.getItem('auth_user');
     if (stored) {
       try {
@@ -59,33 +48,43 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function completeRegistration() {
-    if (user.value) {
-      user.value.registration_completed = true;
-      localStorage.setItem('auth_user', JSON.stringify(user.value));
-    }
-  }
-
-  async function logout() {
-    try {
-      await api.post('/auth/logout');
-    } catch {
-      // Ignore errors on logout
-    }
-    
+  /**
+   * Realiza logout
+   */
+  function logout(): void {
     user.value = null;
     localStorage.removeItem('auth_user');
+    window.location.href = '/';
   }
 
+  /**
+   * Retorna o estado atual
+   */
+  function getState(): AuthState {
+    return {
+      user: user.value,
+      loading: loading.value,
+      error: error.value,
+    };
+  }
+
+  // Carrega do storage ao inicializar
+  loadFromStorage();
+
   return {
+    // State
     user,
     loading,
+    error,
+    // Getters
     isAuthenticated,
+    isRegistrationComplete,
     needsRegistration,
+    // Actions
     loginWithGoogle,
-    handleCallback,
+    setUser,
     loadFromStorage,
-    completeRegistration,
     logout,
+    getState,
   };
 });

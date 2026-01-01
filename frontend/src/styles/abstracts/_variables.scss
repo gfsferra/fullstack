@@ -1,0 +1,94 @@
+// Colors (Catppuccin Mocha )
+$color-base: #1e1e2e;
+$color-surface: #181825;
+$color-overlay: #313244;
+$color-text: #cdd6f4;
+$color-subtext: #a6adc8;
+$color-lavender: #b4befe;
+$color-blue: #89b4fa;
+$color-sapphire: #74c7ec;
+$color-sky: #89dceb;
+$color-teal: #94e2d5;
+$color-green: #a6e3a1;
+$color-yellow: #f9e2af;
+$color-peach: #fab387;
+$color-maroon: #eba0ac;
+$color-red: #f38ba8;
+$color-mauve: #cba6f7;
+$color-pink: #f5c2e7;
+$color-flamingo: #f2cdcd;
+$color-rosewater: #f5e0dc;
+
+// State colors
+$color-success: $color-green;
+$color-warning: $color-yellow;
+$color-error: $color-red;
+$color-info: $color-blue;
+
+// Background colors
+$bg-primary: $color-base;
+$bg-secondary: $color-surface;
+$bg-card: $color-overlay;
+
+$font-primary: 'JetBrains Mono', 'Fira Code', monospace;
+$font-secondary: 'Roboto', 'Inter', sans-serif;
+
+$font-size-xs: 0.75rem;   // 12px
+$font-size-sm: 0.875rem;  // 14px
+$font-size-base: 1rem;    // 16px
+$font-size-lg: 1.125rem;  // 18px
+$font-size-xl: 1.25rem;   // 20px
+$font-size-2xl: 1.5rem;   // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem;  // 36px
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+$spacing-0: 0;
+$spacing-1: 0.25rem;  // 4px
+$spacing-2: 0.5rem;   // 8px
+$spacing-3: 0.75rem;  // 12px
+$spacing-4: 1rem;     // 16px
+$spacing-5: 1.25rem;  // 20px
+$spacing-6: 1.5rem;   // 24px
+$spacing-8: 2rem;     // 32px
+$spacing-10: 2.5rem;  // 40px
+$spacing-12: 3rem;    // 48px
+$spacing-16: 4rem;    // 64px
+
+$border-radius-sm: 0.25rem;  // 4px
+$border-radius-md: 0.5rem;   // 8px
+$border-radius-lg: 0.75rem;  // 12px
+$border-radius-xl: 1rem;     // 16px
+$border-radius-full: 9999px;
+
+$border-width: 1px;
+$border-color: $color-overlay;
+
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+$transition: all 0.2s ease-in-out;
+
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
