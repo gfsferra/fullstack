@@ -40,27 +40,35 @@ class UserController extends Controller
     }
 
     /**
-     * Lista todos os usuários.
+     * Lista usuários com paginação e filtros.
      *
+     * @param Request $request Requisição HTTP
      * @return JsonResponse
      *
+     * @queryParam name string Filtro por nome (busca parcial). Example: João
+     * @queryParam cpf string Filtro por CPF (busca parcial). Example: 123.456
+     * @queryParam per_page int Itens por página (default: 15, max: 100). Example: 20
+     * @queryParam page int Página atual (default: 1). Example: 1
+     *
      * @response 200 {
-     *   "data": [
-     *     {
-     *       "id": 1,
-     *       "name": "João Silva",
-     *       "email": "joao@email.com",
-     *       "phone": "11999999999",
-     *       "birth_date": "1990-01-15",
-     *       "cpf": "123.456.789-00",
-     *       "age": 34
-     *     }
-     *   ]
+     *   "data": [...],
+     *   "current_page": 1,
+     *   "last_page": 10,
+     *   "per_page": 15,
+     *   "total": 150
      * }
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $users = $this->userService->getAllUsers();
+        $filters = [
+            'name' => $request->query('name'),
+            'cpf' => $request->query('cpf'),
+        ];
+
+        $perPage = min((int) $request->query('per_page', 15), 100); // Máximo 100 por página
+        $page = (int) $request->query('page', 1);
+
+        $users = $this->userService->paginateUsers($filters, $perPage, $page);
 
         return response()->json($users);
     }

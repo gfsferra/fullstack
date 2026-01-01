@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -86,5 +87,15 @@ interface UserRepositoryInterface
      * @return Collection<int, User>
      */
     public function findPendingUsers(): Collection;
+
+    /**
+     * Busca usuários paginados com filtros opcionais.
+     *
+     * @param array<string, mixed> $filters Filtros (name, cpf)
+     * @param int $perPage Itens por página
+     * @param int $page Página atual
+     * @return LengthAwarePaginator
+     */
+    public function paginate(array $filters = [], int $perPage = 15, int $page = 1): LengthAwarePaginator;
 }
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -46,6 +47,19 @@ class UserService
     public function getAllUsers(): Collection
     {
         return $this->userRepository->all();
+    }
+
+    /**
+     * Retorna usuários paginados com filtros.
+     *
+     * @param array<string, mixed> $filters Filtros (name, cpf)
+     * @param int $perPage Itens por página
+     * @param int $page Página atual
+     * @return LengthAwarePaginator
+     */
+    public function paginateUsers(array $filters = [], int $perPage = 15, int $page = 1): LengthAwarePaginator
+    {
+        return $this->userRepository->paginate($filters, $perPage, $page);
     }
 
     /**

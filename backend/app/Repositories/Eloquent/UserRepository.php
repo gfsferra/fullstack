@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -131,6 +132,30 @@ class UserRepository implements UserRepositoryInterface
             ->where('registration_completed', false)
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function paginate(array $filters = [], int $perPage = 15, int $page = 1): LengthAwarePaginator
+    {
+        $query = $this->model->newQuery();
+
+        // Filtro por nome (busca parcial case-insensitive)
+        if (!empty($filters['name'])) {
+            $query->where('name', 'LIKE', '%' . $filters['name'] . '%');
+        }
+
+        // Filtro por CPF (busca parcial, remove formatação)
+        if (!empty($filters['cpf'])) {
+            $cpfClean = preg_replace('/\D/', '', $filters['cpf']);
+            $query->where('cpf', 'LIKE', '%' . $cpfClean . '%');
+        }
+
+        // Índice para otimização: ordenar por ID (índice primário)
+        $query->orderBy('id', 'desc');
+
+        return $query->paginate(perPage: $perPage, page: $page);
     }
 }
 
