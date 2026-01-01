@@ -1,136 +1,166 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useUserStore } from '@/stores/userStore';
-import UserForm from '@/components/UserForm.vue';
-import UserList from '@/components/UserList.vue';
-import type { User } from '@/types/User';
+/**
+ * HomeView - Página inicial
+ * Exibe tela de boas-vindas e login com Google
+ */
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
+import GoogleLoginButton from '@/components/ui/GoogleLoginButton.vue';
 
-const userStore = useUserStore();
-const editingUser = ref<User | undefined>(undefined);
-const showForm = ref(false);
+const router = useRouter();
+const authStore = useAuthStore();
 
-onMounted(() => {
-  userStore.fetchUsers();
-});
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 
-async function handleSubmit(userData: User) {
-  try {
-    if (editingUser.value?.id) {
-      await userStore.updateUser(editingUser.value.id, userData);
-    } else {
-      await userStore.createUser(userData);
-    }
-    showForm.value = false;
-    editingUser.value = undefined;
-  } catch (error: any) {
-    alert(error.response?.data?.message || 'Erro ao salvar usuário');
+// Redireciona se já estiver autenticado
+if (isAuthenticated.value) {
+  if (authStore.user?.registration_completed) {
+    router.push('/users');
+  } else {
+    router.push('/register-complete');
   }
-}
-
-function handleEdit(user: User) {
-  editingUser.value = user;
-  showForm.value = true;
-}
-
-async function handleDelete(id: number) {
-  if (confirm('Tem certeza que deseja excluir este usuário?')) {
-    await userStore.deleteUser(id);
-  }
-}
-
-function handleCancel() {
-  showForm.value = false;
-  editingUser.value = undefined;
 }
 </script>
 
 <template>
   <div class="home">
-    <header class="header">
-      <h1>📋 Cadastro de Usuários</h1>
-      <button v-if="!showForm" class="btn-add" @click="showForm = true">
-        + Novo Usuário
-      </button>
-    </header>
+    <div class="home__content">
+      <div class="home__hero">
+        <h1 class="home__title">
+          <span class="home__emoji">📋</span>
+          Cadastro de Usuários
+        </h1>
+        <p class="home__subtitle">
+          Sistema de cadastro com autenticação Google OAuth
+        </p>
+      </div>
 
-    <main class="content">
-      <section v-if="showForm" class="form-section">
-        <h2>{{ editingUser?.id ? 'Editar Usuário' : 'Novo Usuário' }}</h2>
-        <UserForm 
-          :user="editingUser" 
-          @submit="handleSubmit" 
-          @cancel="handleCancel" 
-        />
-      </section>
+      <div class="home__actions">
+        <GoogleLoginButton />
 
-      <section class="list-section">
-        <h2>Usuários Cadastrados</h2>
-        <div v-if="userStore.loading" class="loading">Carregando...</div>
-        <UserList 
-          v-else
-          :users="userStore.users" 
-          @edit="handleEdit" 
-          @delete="handleDelete" 
-        />
-      </section>
-    </main>
+        <p class="home__info">
+          Faça login com sua conta Google para acessar o sistema
+        </p>
+      </div>
+
+      <div class="home__features">
+        <div class="feature-card">
+          <span class="feature-card__icon">🔐</span>
+          <h3 class="feature-card__title">Login Seguro</h3>
+          <p class="feature-card__description">
+            Autenticação via Google OAuth 2.0
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">👥</span>
+          <h3 class="feature-card__title">Lista de Usuários</h3>
+          <p class="feature-card__description">
+            Visualize os usuários cadastrados
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">📧</span>
+          <h3 class="feature-card__title">Confirmação por E-mail</h3>
+          <p class="feature-card__description">
+            Notificação automática de cadastro
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+  @use '@/styles/abstracts/variables' as *;
+  @use '@/styles/abstracts/mixins' as *;
+
 .home {
   min-height: 100vh;
-  background: linear-gradient(135deg, #11111b 0%, #181825 100%);
-  padding: 2rem;
+  @include flex-center;
+  padding: $spacing-8;
+
+  &__content {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+  }
+
+  &__hero {
+    margin-bottom: $spacing-12;
+  }
+
+  &__title {
+    font-size: $font-size-4xl;
+    margin-bottom: $spacing-4;
+    color: $color-lavender;
+
+    @include mobile {
+      font-size: $font-size-2xl;
+    }
+  }
+
+  &__emoji {
+    display: inline-block;
+    margin-right: $spacing-2;
+  }
+
+  &__subtitle {
+    font-size: $font-size-lg;
+    color: $color-subtext;
+
+    @include mobile {
+      font-size: $font-size-base;
+    }
+  }
+
+  &__actions {
+    margin-bottom: $spacing-12;
+    @include flex-column;
+    align-items: center;
+    gap: $spacing-4;
+  }
+
+  &__info {
+    color: $color-subtext;
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+
+  &__features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $spacing-6;
+  }
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto 2rem;
-}
-
-h1 {
-  color: #cdd6f4;
-  font-size: 2rem;
-  margin: 0;
-}
-
-.btn-add {
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #a6e3a1, #94e2d5);
-  border: none;
-  border-radius: 8px;
-  color: #11111b;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.btn-add:hover {
-  transform: scale(1.05);
-}
-
-.content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.form-section, .list-section {
-  margin-bottom: 2rem;
-}
-
-h2 {
-  color: #cdd6f4;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-}
-
-.loading {
+.feature-card {
+  @include card;
   text-align: center;
-  color: #6c7086;
-  padding: 2rem;
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &__icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-3;
+    display: block;
+  }
+
+  &__title {
+    font-size: $font-size-base;
+    color: $color-text;
+    margin-bottom: $spacing-2;
+  }
+
+  &__description {
+    font-size: $font-size-sm;
+    color: $color-subtext;
+    margin: 0;
+  }
 }
 </style>

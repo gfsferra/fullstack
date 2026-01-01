@@ -4,107 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro Concluído</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #4CAF50;
-        }
-        .header h1 {
-            color: #4CAF50;
-            margin: 0;
-            font-size: 28px;
-        }
-        .content {
-            padding: 30px 0;
-        }
-        .success-icon {
-            text-align: center;
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-        .user-info {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .user-info p {
-            margin: 8px 0;
-        }
-        .user-info strong {
-            color: #555;
-        }
-        .footer {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #888;
-            font-size: 14px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎉 Cadastro Concluído!</h1>
-        </div>
-        
-        <div class="content">
-            <div class="success-icon">✅</div>
-            
-            <p>Olá, <strong>{{ $user->name }}</strong>!</p>
-            
-            <p>Seu cadastro em nosso sistema foi concluído com sucesso. Estamos muito felizes em tê-lo conosco!</p>
-            
-            <div class="user-info">
-                <h3>📋 Seus Dados Cadastrados:</h3>
-                <p><strong>Nome:</strong> {{ $user->name }}</p>
-                <p><strong>E-mail:</strong> {{ $user->email }}</p>
-                @if($user->cpf)
-                <p><strong>CPF:</strong> {{ $user->cpf }}</p>
-                @endif
-                @if($user->birth_date)
-                <p><strong>Data de Nascimento:</strong> {{ $user->birth_date->format('d/m/Y') }}</p>
-                @endif
-                <p><strong>Cadastrado em:</strong> {{ $user->created_at->format('d/m/Y H:i') }}</p>
-            </div>
-            
-            <p>Agora você tem acesso completo ao nosso sistema. Aproveite todos os recursos disponíveis!</p>
-            
-            <p style="text-align: center;">
-                <a href="{{ config('app.url') }}" class="btn">Acessar o Sistema</a>
-            </p>
-        </div>
-        
-        <div class="footer">
-            <p>Este é um e-mail automático, por favor não responda.</p>
-            <p>© {{ date('Y') }} {{ $appName ?? config('app.name') }}. Todos os direitos reservados.</p>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Main Container -->
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%;">
+                    <!-- Card -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #1e1e2e 0%, #313244 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);">
+                            
+                            <!-- Header -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding: 40px 40px 30px; background: linear-gradient(135deg, #45475a 0%, #313244 100%);">
+                                        <span style="font-size: 48px; display: block; margin-bottom: 16px;">🎉</span>
+                                        <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #cdd6f4;">Cadastro Concluído!</h1>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Content -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="padding: 40px;">
+                                        <!-- Greeting -->
+                                        <p style="margin: 0 0 16px; font-size: 18px; color: #cdd6f4;">
+                                            Olá, <span style="color: #b4befe; font-weight: 600;">{{ $user->name }}</span>!
+                                        </p>
+                                        
+                                        <p style="margin: 0 0 32px; font-size: 16px; color: #a6adc8;">
+                                            Seu cadastro foi concluído com sucesso em nosso sistema. Agora você tem acesso completo a todas as funcionalidades.
+                                        </p>
+                                        
+                                        <!-- User Data Card -->
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #45475a; border-radius: 12px; margin-bottom: 32px;">
+                                            <tr>
+                                                <td style="padding: 24px;">
+                                                    <h3 style="margin: 0 0 20px; font-size: 14px; font-weight: 600; color: #a6adc8; text-transform: uppercase; letter-spacing: 0.05em;">SEUS DADOS</h3>
+                                                    
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #a6adc8; font-size: 14px; width: 120px;">Nome:</td>
+                                                            <td style="padding: 8px 0; color: #cdd6f4; font-size: 14px; font-weight: 500;">{{ $user->name }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #a6adc8; font-size: 14px;">E-mail:</td>
+                                                            <td style="padding: 8px 0;">
+                                                                <a href="mailto:{{ $user->email }}" style="color: #89b4fa; text-decoration: none; font-size: 14px;">{{ $user->email }}</a>
+                                                            </td>
+                                                        </tr>
+                                                        @if($user->cpf)
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #a6adc8; font-size: 14px;">CPF:</td>
+                                                            <td style="padding: 8px 0; color: #cdd6f4; font-size: 14px; font-weight: 500;">{{ $user->cpf }}</td>
+                                                        </tr>
+                                                        @endif
+                                                        @if($user->birth_date)
+                                                        <tr>
+                                                            <td style="padding: 8px 0; color: #a6adc8; font-size: 14px;">Nascimento:</td>
+                                                            <td style="padding: 8px 0; color: #cdd6f4; font-size: 14px; font-weight: 500;">{{ $user->birth_date->format('d/m/Y') }}</td>
+                                                        </tr>
+                                                        @endif
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        
+                                        <!-- Security Notice -->
+                                        <p style="margin: 0 0 32px; font-size: 14px; color: #a6adc8;">
+                                            Se você não realizou este cadastro, por favor entre em contato conosco imediatamente.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Footer -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding: 24px 40px; border-top: 1px solid #45475a;">
+                                        <p style="margin: 0 0 8px; font-size: 12px; color: #6c7086;">
+                                            Este é um e-mail automático. Por favor, não responda.
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #6c7086;">
+                                            © {{ date('Y') }} Sistema de Cadastro de Usuários
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
