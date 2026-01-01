@@ -1,12 +1,15 @@
 <script setup lang="ts">
 /**
  * UsersView - Página de listagem de usuários
+ * Com filtros otimizados e paginação para grandes volumes
  */
 import { onMounted } from 'vue';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore, type UserFilters } from '@/stores/userStore';
 import { useAuthStore } from '@/stores/authStore';
 import UserList from '@/components/users/UserList.vue';
 import UserHeader from '@/components/users/UserHeader.vue';
+import UserFiltersComponent from '@/components/users/UserFilters.vue';
+import UserPagination from '@/components/users/UserPagination.vue';
 
 const userStore = useUserStore();
 const authStore = useAuthStore();
@@ -14,6 +17,20 @@ const authStore = useAuthStore();
 onMounted(async () => {
   await userStore.fetchUsers();
 });
+
+/**
+ * Aplica filtros
+ */
+async function handleFilter(filters: UserFilters): Promise<void> {
+  await userStore.applyFilters(filters);
+}
+
+/**
+ * Limpa filtros
+ */
+async function handleClearFilters(): Promise<void> {
+  await userStore.clearFilters();
+}
 </script>
 
 <template>
@@ -27,16 +44,36 @@ onMounted(async () => {
           <div class="card__header flex-between">
             <h2 class="card__title">Usuários Cadastrados</h2>
             <span class="users-view__count">
-              {{ userStore.users.length }} usuário(s)
+              {{ userStore.total }} usuário(s)
             </span>
           </div>
           <div class="card__body">
+            <!-- Filtros -->
+            <UserFiltersComponent
+              @filter="handleFilter"
+              @clear="handleClearFilters"
+            />
+
+            <!-- Loading -->
             <div v-if="userStore.loading" class="users-view__loading">
               <div class="loading-spinner"></div>
               <p>Carregando usuários...</p>
             </div>
 
-            <UserList v-else :users="userStore.users" />
+            <!-- Lista -->
+            <template v-else>
+              <UserList :users="userStore.users" />
+
+              <!-- Paginação -->
+              <UserPagination
+                :current-page="userStore.currentPage"
+                :last-page="userStore.lastPage"
+                :total="userStore.total"
+                @previous="userStore.previousPage()"
+                @next="userStore.nextPage()"
+                @goto="userStore.goToPage"
+              />
+            </template>
           </div>
         </div>
       </section>
