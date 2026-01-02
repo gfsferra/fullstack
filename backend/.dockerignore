@@ -1,0 +1,37 @@
+# Dependências
+vendor
+
+# Environment
+.env
+.env.backup
+.env.production
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Logs e Cache
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Testes
+phpunit.xml
+.phpunit.result.cache
+tests
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+

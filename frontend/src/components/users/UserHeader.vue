@@ -31,6 +31,7 @@ defineEmits<Emits>();
             :src="user.avatar" 
             :alt="user.name" 
             class="user-header__avatar"
+            referrerpolicy="no-referrer"
           />
           <span class="user-header__name">{{ user.name }}</span>
           <button class="btn btn--secondary btn--sm" @click="$emit('logout')">

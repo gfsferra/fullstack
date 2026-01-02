@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\GoogleProvider;
 
 /**
  * Class GoogleAuthController
@@ -30,9 +31,10 @@ class GoogleAuthController extends Controller
      */
     public function redirect(): RedirectResponse
     {
-        return Socialite::driver('google')
-            ->stateless()
-            ->redirect();
+        /** @var GoogleProvider $driver */
+        $driver = Socialite::driver('google');
+        
+        return $driver->stateless()->redirect();
     }
 
     /**
@@ -46,18 +48,20 @@ class GoogleAuthController extends Controller
     public function callback(): RedirectResponse
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var GoogleProvider $driver */
+            $driver = Socialite::driver('google');
+            
+            /** @var \Laravel\Socialite\Two\User $googleUser */
+            $googleUser = $driver->stateless()->user();
 
             Log::info('Google OAuth callback recebido', [
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
             ]);
 
-            // Verifica se o usuário já existe
             $existingUser = User::where('email', $googleUser->getEmail())->first();
 
             if ($existingUser) {
-                // Atualiza usuário existente com dados do Google
                 $existingUser->update([
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
@@ -65,7 +69,6 @@ class GoogleAuthController extends Controller
                 ]);
                 $user = $existingUser;
             } else {
-                // Cria novo usuário
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -81,7 +84,6 @@ class GoogleAuthController extends Controller
                 'registration_completed' => $user->registration_completed,
             ]);
 
-            // Redireciona para o frontend com os dados do usuário
             $frontendUrl = config('app.frontend_url', 'http://localhost:5173');
 
             return redirect()->away(
@@ -126,22 +128,10 @@ class GoogleAuthController extends Controller
      */
     public function user(): JsonResponse
     {
-        $userId = session('user_id');
-
-        if (!$userId) {
-            return response()->json(['authenticated' => false], 401);
-        }
-
+        $userId = auth()->user()->id;
         $user = User::find($userId);
 
-        if (!$user) {
-            return response()->json(['authenticated' => false], 401);
-        }
-
-        return response()->json([
-            'authenticated' => true,
-            'user' => $user,
-        ]);
+        return response()->json($user);
     }
 
     /**

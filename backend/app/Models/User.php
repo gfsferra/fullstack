@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $name
  * @property string $email
- * @property string|null $phone
  * @property Carbon|null $birth_date
  * @property string|null $cpf
  * @property string|null $google_id
@@ -32,7 +31,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $updated_at
  *
  * @property-read int|null $age Idade calculada a partir da data de nascimento
- * @property-read string $formatted_phone Telefone formatado
  */
 class User extends Model
 {
@@ -53,7 +51,6 @@ class User extends Model
     protected $fillable = [
         'name',
         'email',
-        'phone',
         'birth_date',
         'cpf',
         'google_id',
@@ -123,46 +120,6 @@ class User extends Model
         return Attribute::make(
             get: fn (string $value): string => $value,
             set: fn (string $value): string => mb_convert_case(trim($value), MB_CASE_TITLE, 'UTF-8')
-        );
-    }
-
-    /**
-     * Accessor para telefone formatado.
-     *
-     * Formata o telefone no padrão brasileiro (XX) XXXXX-XXXX.
-     *
-     * @return Attribute<string|null, never>
-     */
-    protected function formattedPhone(): Attribute
-    {
-        return Attribute::make(
-            get: function (): ?string {
-                if (!$this->phone) {
-                    return null;
-                }
-
-                $phone = preg_replace('/[^0-9]/', '', $this->phone);
-
-                if (strlen($phone) === 11) {
-                    return sprintf(
-                        '(%s) %s-%s',
-                        substr($phone, 0, 2),
-                        substr($phone, 2, 5),
-                        substr($phone, 7, 4)
-                    );
-                }
-
-                if (strlen($phone) === 10) {
-                    return sprintf(
-                        '(%s) %s-%s',
-                        substr($phone, 0, 2),
-                        substr($phone, 2, 4),
-                        substr($phone, 6, 4)
-                    );
-                }
-
-                return $this->phone;
-            }
         );
     }
 

@@ -157,7 +157,6 @@ class UserService
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email' . ($userId ? ',' . $userId : ''),
-            'phone' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
             'cpf' => 'nullable|string|size:14|unique:users,cpf' . ($userId ? ',' . $userId : ''),
         ];
