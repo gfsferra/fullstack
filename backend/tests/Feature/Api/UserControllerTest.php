@@ -58,7 +58,6 @@ class UserControllerTest extends TestCase
         $data = [
             'name' => 'João Silva',
             'email' => 'joao@example.com',
-            'phone' => '11999999999',
         ];
 
         $response = $this->postJson('/api/users', $data);

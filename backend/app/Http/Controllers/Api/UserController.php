@@ -81,7 +81,6 @@ class UserController extends Controller
      *
      * @bodyParam name string required Nome do usuário. Example: João Silva
      * @bodyParam email string required E-mail do usuário. Example: joao@email.com
-     * @bodyParam phone string Telefone do usuário. Example: 11999999999
      * @bodyParam birth_date date Data de nascimento. Example: 1990-01-15
      *
      * @response 201 {

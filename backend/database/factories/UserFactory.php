@@ -36,7 +36,6 @@ class UserFactory extends Factory
         return [
             'name' => fake('pt_BR')->name(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => fake('pt_BR')->cellphoneNumber(),
             'birth_date' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'cpf' => $this->generateCpf(),
             'google_id' => null,
