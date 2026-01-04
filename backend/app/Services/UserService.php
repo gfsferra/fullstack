@@ -154,7 +154,6 @@ class UserService
      */
     protected function validateUserData(array $data, ?int $userId = null): void
     {
-        // Normaliza CPF para validação (remove formatação)
         $cpfClean = isset($data['cpf']) ? preg_replace('/[^0-9]/', '', $data['cpf']) : null;
 
         $rules = [
@@ -176,22 +175,18 @@ class UserService
 
         $validator = Validator::make($data, $rules, $messages);
 
-        // Validação customizada para CPF
         $validator->after(function ($validator) use ($cpfClean, $userId) {
             if ($cpfClean) {
-                // Valida tamanho
                 if (strlen($cpfClean) !== 11) {
                     $validator->errors()->add('cpf', 'O CPF deve ter 11 dígitos.');
                     return;
                 }
 
-                // Valida dígitos verificadores
                 if (!$this->validateCpfDigits($cpfClean)) {
                     $validator->errors()->add('cpf', 'O CPF informado é inválido.');
                     return;
                 }
 
-                // Valida unicidade
                 $existingUser = User::where('cpf', $cpfClean)
                     ->when($userId, fn($q) => $q->where('id', '!=', $userId))
                     ->first();
@@ -215,12 +210,10 @@ class UserService
      */
     protected function validateCpfDigits(string $cpf): bool
     {
-        // Verifica se todos os dígitos são iguais
         if (preg_match('/^(\d)\1{10}$/', $cpf)) {
             return false;
         }
 
-        // Calcula primeiro dígito verificador
         $sum = 0;
         for ($i = 0; $i < 9; $i++) {
             $sum += intval($cpf[$i]) * (10 - $i);
@@ -232,7 +225,6 @@ class UserService
             return false;
         }
 
-        // Calcula segundo dígito verificador
         $sum = 0;
         for ($i = 0; $i < 10; $i++) {
             $sum += intval($cpf[$i]) * (11 - $i);

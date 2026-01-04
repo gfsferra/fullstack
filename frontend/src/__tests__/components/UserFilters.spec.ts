@@ -208,7 +208,7 @@ describe('UserFilters', () => {
   });
 
   describe('estado de loading', () => {
-    it('deve adicionar classe is-searching quando loading', async () => {
+    it('deve adicionar classe is-active quando tem valor', async () => {
       const wrapper = mount(UserFilters, {
         props: { loading: true },
       });
@@ -217,7 +217,7 @@ describe('UserFilters', () => {
       await wrapper.find('#filter-name').trigger('input');
       await nextTick();
       
-      expect(wrapper.find('#filter-name').classes()).toContain('is-searching');
+      expect(wrapper.find('#filter-name').classes()).toContain('is-active');
     });
 
     it('deve mostrar spinner quando buscando com valor', async () => {

@@ -66,7 +66,6 @@ class GoogleAuthController extends Controller
 
             $existingUser = User::where('email', $googleUser->getEmail())->first();
 
-            // Calcular data de expiração do token
             $expiresAt = isset($googleUser->expiresIn) 
                 ? Carbon::now()->addSeconds($googleUser->expiresIn)
                 : null;
@@ -79,7 +78,6 @@ class GoogleAuthController extends Controller
                     'google_token_expires_at' => $expiresAt,
                 ];
 
-                // Só atualiza refresh_token se recebido (Google só envia no primeiro login)
                 if (!empty($googleUser->refreshToken)) {
                     $updateData['google_refresh_token'] = $googleUser->refreshToken;
                 }

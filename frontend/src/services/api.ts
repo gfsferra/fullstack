@@ -2,6 +2,10 @@ import axios, { type AxiosInstance, type AxiosError } from 'axios';
 
 /**
  * Instância configurada do Axios para comunicação com a API
+ * @service api
+ * @property {string} baseURL - URL base da API
+ * @property {number} timeout - Tempo limite da requisição
+ * @property {AxiosRequestConfig['headers']} headers - Headers padrão da requisição
  */
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
@@ -14,13 +18,15 @@ const api: AxiosInstance = axios.create({
 
 /**
  * Interceptor de requisições
- * Adiciona token de autenticação se disponível
+ * @interceptor request
+ * @param {AxiosRequestConfig} config - Configuração da requisição
+ * @returns {AxiosRequestConfig} Configuração da requisição
+ * @throws {AxiosError} Erro da requisição
  */
 api.interceptors.request.use(
   (config) => {
     const authUser = localStorage.getItem('auth_user');
     if (authUser) {
-      // Pode adicionar token aqui se necessário
     }
     return config;
   },
@@ -31,13 +37,15 @@ api.interceptors.request.use(
 
 /**
  * Interceptor de respostas
- * Trata erros globais
+ * @interceptor response
+ * @param {AxiosResponse} response - Resposta da requisição
+ * @returns {AxiosResponse} Resposta da requisição
+ * @throws {AxiosError} Erro da requisição
  */
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Limpa storage e redireciona para login
       localStorage.removeItem('auth_user');
       window.location.href = '/';
     }

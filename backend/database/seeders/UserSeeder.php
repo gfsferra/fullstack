@@ -18,7 +18,9 @@ use Illuminate\Database\Seeder;
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Executa o seeder.
+     * 
+     * @return void
      *
      * Cria:
      * - 10 usuários com cadastro completo
@@ -29,31 +31,27 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Usuários com cadastro completo
         User::factory()
             ->count(10)
             ->create();
 
-        // Usuários do Google com cadastro pendente
         User::factory()
             ->count(3)
             ->fromGoogle()
             ->pending()
             ->create();
 
-        // Usuários do Google com cadastro completo
         User::factory()
             ->count(5)
             ->fromGoogle()
             ->create();
 
-        // Usuários menores de idade
         User::factory()
             ->count(2)
             ->minor()
             ->create();
 
-        $this->command->info('✅ Usuários criados com sucesso!');
+        $this->command->info('Usuários criados com sucesso!');
         $this->command->table(
             ['Tipo', 'Quantidade'],
             [

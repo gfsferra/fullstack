@@ -1,45 +1,484 @@
 @use 'variables' as *;
 
+/// Fade in
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
 }
 
-@keyframes slideUp {
+/// Fade out
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/// Fade in up (entrada com movimento)
+@keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+/// Fade in down
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/// Fade in left
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/// Fade in right
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/// Slide up (legacy alias)
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/// Slide down
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/// Scale in (zoom)
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/// Scale out
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/// Bounce in
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/// Spin (loading)
 @keyframes spin {
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
 }
 
+/// Pulse
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/// Pulse scale
+@keyframes pulseScale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/// Ping (notification dot)
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/// Bounce
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/// Shake (para erros)
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/// Wiggle
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+/// Float (hover suave)
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/// Skeleton shimmer
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/// Gradient shift
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/// Glow pulse
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--color-lavender),
+                0 0 10px var(--color-lavender),
+                0 0 15px var(--color-lavender);
+  }
+  50% {
+    box-shadow: 0 0 10px var(--color-lavender),
+                0 0 20px var(--color-lavender),
+                0 0 30px var(--color-lavender);
+  }
+}
+
+/// Typewriter cursor blink
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+// Durações
+.animate-instant { animation-duration: $duration-instant; }
+.animate-fast { animation-duration: $duration-fast; }
+.animate-normal { animation-duration: $duration-normal; }
+.animate-slow { animation-duration: $duration-slow; }
+.animate-slower { animation-duration: $duration-slower; }
+
+// Delay classes para stagger
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+.animate-delay-700 { animation-delay: 700ms; }
+.animate-delay-1000 { animation-delay: 1000ms; }
+
+// Fill mode
+.animate-fill-forwards { animation-fill-mode: forwards; }
+.animate-fill-backwards { animation-fill-mode: backwards; }
+.animate-fill-both { animation-fill-mode: both; }
+
+// Iteration
+.animate-infinite { animation-iteration-count: infinite; }
+.animate-once { animation-iteration-count: 1; }
+.animate-twice { animation-iteration-count: 2; }
+
+// Direction
+.animate-reverse { animation-direction: reverse; }
+.animate-alternate { animation-direction: alternate; }
+
+// Easing
+.animate-linear { animation-timing-function: linear; }
+.animate-ease-in { animation-timing-function: $ease-in; }
+.animate-ease-out { animation-timing-function: $ease-out; }
+.animate-ease-in-out { animation-timing-function: $ease-in-out; }
+.animate-bounce { animation-timing-function: $ease-bounce; }
+
+/// Fade in simples
 .animate-fade-in {
-  animation: fadeIn $transition;
+  animation: fadeIn $duration-normal $ease-out forwards;
 }
 
+/// Fade out
+.animate-fade-out {
+  animation: fadeOut $duration-normal $ease-out forwards;
+}
+
+/// Slide up com fade
 .animate-slide-up {
-  animation: slideUp $transition;
+  animation: fadeInUp $duration-normal $ease-out forwards;
 }
 
+/// Slide down com fade  
+.animate-slide-down {
+  animation: fadeInDown $duration-normal $ease-out forwards;
+}
+
+/// Slide left
+.animate-slide-left {
+  animation: fadeInLeft $duration-normal $ease-out forwards;
+}
+
+/// Slide right
+.animate-slide-right {
+  animation: fadeInRight $duration-normal $ease-out forwards;
+}
+
+/// Scale in
+.animate-scale-in {
+  animation: scaleIn $duration-normal $ease-bounce forwards;
+}
+
+/// Bounce in
+.animate-bounce-in {
+  animation: bounceIn $duration-slow $ease-bounce forwards;
+}
+
+/// Spin (loading)
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+/// Pulse
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/// Pulse scale
+.animate-pulse-scale {
+  animation: pulseScale 2s ease-in-out infinite;
+}
+
+/// Ping
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/// Bounce vertical
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/// Shake (erro)
+.animate-shake {
+  animation: shake 0.5s $ease-out;
+}
+
+/// Wiggle
+.animate-wiggle {
+  animation: wiggle 0.3s ease-in-out infinite;
+}
+
+/// Float
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/// Skeleton loading
+.animate-skeleton {
+  animation: skeleton-shimmer 1.5s linear infinite;
+}
+
+/// Gradient shift
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+/// Glow
+.animate-glow {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/// Blink (cursor)
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/// Remove animações para usuários que preferem movimento reduzido
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/// Fade transition
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $duration-normal $ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/// Slide fade transition
+.slide-fade-enter-active {
+  transition: all $duration-normal $ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all $duration-fast $ease-in;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+/// Scale transition
+.scale-enter-active,
+.scale-leave-active {
+  transition: all $duration-normal $ease-bounce;
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/// Expand transition (para acordeões)
+.expand-enter-active,
+.expand-leave-active {
+  transition: all $duration-normal $ease-out;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/// List transition
+.list-enter-active,
+.list-leave-active {
+  transition: all $duration-normal $ease-out;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.list-move {
+  transition: transform $duration-normal $ease-out;
 }

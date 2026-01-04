@@ -1,11 +1,18 @@
 <script setup lang="ts">
-/**
- * NotFoundView - Página 404
- */
 import { useRouter } from 'vue-router';
 
+/**
+ * Define o router
+ * @function useRouter
+ * @returns {Router} Router
+ */
 const router = useRouter();
 
+/**
+ * Redireciona o usuário para a página inicial
+ * @function goHome
+ * @returns {void}
+ */
 function goHome(): void {
   router.push('/');
 }

@@ -33,13 +33,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake('pt_BR')->name();
+        $encodedName = urlencode($name);
+        
         return [
-            'name' => fake('pt_BR')->name(),
+            'name' => $name,
             'email' => fake()->unique()->safeEmail(),
             'birth_date' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
             'cpf' => $this->generateCpf(),
             'google_id' => null,
-            'avatar' => null,
+            'avatar' => "https://ui-avatars.com/api/?name={$encodedName}&background=random&color=fff&size=200",
             'google_token' => null,
             'registration_completed' => true,
         ];
@@ -66,11 +69,16 @@ class UserFactory extends Factory
      */
     public function fromGoogle(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'google_id' => fake()->uuid(),
-            'avatar' => fake()->imageUrl(200, 200, 'people'),
-            'google_token' => fake()->sha256(),
-        ]);
+        return $this->state(function (array $attributes) {
+            $name = $attributes['name'] ?? 'User';
+            $encodedName = urlencode($name);
+            
+            return [
+                'google_id' => fake()->uuid(),
+                'avatar' => "https://ui-avatars.com/api/?name={$encodedName}&background=random&color=fff&size=200",
+                'google_token' => fake()->sha256(),
+            ];
+        });
     }
 
     /**
@@ -97,15 +105,13 @@ class UserFactory extends Factory
             $n[$i] = random_int(0, 9);
         }
 
-        // Calcula primeiro dígito verificador
         $sum = 0;
         for ($i = 0; $i < 9; $i++) {
             $sum += $n[$i] * (10 - $i);
         }
         $remainder = $sum % 11;
         $n[9] = ($remainder < 2) ? 0 : 11 - $remainder;
-
-        // Calcula segundo dígito verificador
+        
         $sum = 0;
         for ($i = 0; $i < 10; $i++) {
             $sum += $n[$i] * (11 - $i);

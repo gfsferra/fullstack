@@ -5,6 +5,12 @@ import type { User } from '@/types';
 
 /**
  * Interface para resposta paginada da API
+ * @interface PaginatedResponse
+ * @property {User[]} data - Array de usuários
+ * @property {number} current_page - Página atual
+ * @property {number} last_page - Última página
+ * @property {number} per_page - Itens por página
+ * @property {number} total - Total de itens
  */
 interface PaginatedResponse {
   data: User[];
@@ -16,6 +22,9 @@ interface PaginatedResponse {
 
 /**
  * Interface para filtros de busca
+ * @interface UserFilters
+ * @property {string} name - Filtro por nome
+ * @property {string} cpf - Filtro por CPF
  */
 export interface UserFilters {
   name?: string;
@@ -25,30 +34,31 @@ export interface UserFilters {
 /**
  * Store de usuários
  * Gerencia o estado da listagem de usuários com paginação e filtros
+ * @store user
+ * @method fetchUsers - Busca usuários com paginação e filtros
+ * @method applyFilters - Aplica filtros e recarrega a lista
+ * @method clearFilters - Limpa filtros e recarrega a lista
+ * @method nextPage - Vai para próxima página
+ * @method previousPage - Vai para página anterior
+ * @method goToPage - Vai para página específica
+ * @method clearState - Limpa o estado
  */
 export const useUserStore = defineStore('user', () => {
-  // State
   const users = ref<User[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
   
-  // Paginação
   const currentPage = ref(1);
   const lastPage = ref(1);
   const perPage = ref(15);
   const total = ref(0);
   
-  // Filtros
   const filters = ref<UserFilters>({});
 
-  // Getters
   const userCount = computed(() => total.value);
   const hasNextPage = computed(() => currentPage.value < lastPage.value);
   const hasPreviousPage = computed(() => currentPage.value > 1);
 
-  /**
-   * Busca usuários com paginação e filtros
-   */
   async function fetchUsers(page: number = 1): Promise<void> {
     loading.value = true;
     error.value = null;
@@ -80,52 +90,34 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  /**
-   * Aplica filtros e recarrega a lista
-   */
   async function applyFilters(newFilters: UserFilters): Promise<void> {
     filters.value = { ...newFilters };
-    await fetchUsers(1); // Volta para primeira página ao filtrar
+    await fetchUsers(1);
   }
 
-  /**
-   * Limpa filtros e recarrega a lista
-   */
   async function clearFilters(): Promise<void> {
     filters.value = {};
     await fetchUsers(1);
   }
 
-  /**
-   * Vai para próxima página
-   */
   async function nextPage(): Promise<void> {
     if (hasNextPage.value) {
       await fetchUsers(currentPage.value + 1);
     }
   }
 
-  /**
-   * Vai para página anterior
-   */
   async function previousPage(): Promise<void> {
     if (hasPreviousPage.value) {
       await fetchUsers(currentPage.value - 1);
     }
   }
 
-  /**
-   * Vai para página específica
-   */
   async function goToPage(page: number): Promise<void> {
     if (page >= 1 && page <= lastPage.value) {
       await fetchUsers(page);
     }
   }
 
-  /**
-   * Limpa o estado
-   */
   function clearState(): void {
     users.value = [];
     error.value = null;
@@ -136,7 +128,6 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
-    // State
     users,
     loading,
     error,
@@ -145,11 +136,9 @@ export const useUserStore = defineStore('user', () => {
     perPage,
     total,
     filters,
-    // Getters
     userCount,
     hasNextPage,
     hasPreviousPage,
-    // Actions
     fetchUsers,
     applyFilters,
     clearFilters,

@@ -1,0 +1,231 @@
+@use 'sass:math';
+@use 'sass:color';
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:string';
+
+/// Remove a unidade de um número
+/// @param {Number} $number - Número com unidade
+/// @return {Number} - Número sem unidade
+@function strip-unit($number) {
+  @if type-of($number)=='number' and not unitless($number) {
+    @return math.div($number, $number * 0 + 1);
+  }
+
+  @return $number;
+}
+
+/// Converte px para rem
+/// @param {Number} $px - Valor em pixels
+/// @param {Number} $base=16px - Base font size
+/// @return {Number} - Valor em rem
+@function px-to-rem($px, $base: 16px) {
+  @return math.div(strip-unit($px), strip-unit($base)) * 1rem;
+}
+
+/// Converte rem para px
+/// @param {Number} $rem - Valor em rem
+/// @param {Number} $base=16px - Base font size
+/// @return {Number} - Valor em pixels
+@function rem-to-px($rem, $base: 16px) {
+  @return strip-unit($rem) * strip-unit($base) * 1px;
+}
+
+/// Converte px para em
+/// @param {Number} $px - Valor em pixels
+/// @param {Number} $base=16px - Contexto (parent font size)
+/// @return {Number} - Valor em em
+@function px-to-em($px, $base: 16px) {
+  @return math.div(strip-unit($px), strip-unit($base)) * 1em;
+}
+
+// ==========================================================================
+// FLUID TYPOGRAPHY & SPACING
+// ==========================================================================
+
+/// Gera um valor fluid usando clamp()
+/// @param {Number} $min - Valor mínimo
+/// @param {Number} $max - Valor máximo
+/// @param {Number} $min-vw=375px - Viewport mínimo
+/// @param {Number} $max-vw=1440px - Viewport máximo
+/// @return {String} - Valor CSS clamp()
+@function fluid($min, $max, $min-vw: 375px, $max-vw: 1440px) {
+  $min-val: strip-unit($min);
+  $max-val: strip-unit($max);
+  $min-vw-val: strip-unit($min-vw);
+  $max-vw-val: strip-unit($max-vw);
+
+  $slope: math.div($max-val - $min-val, $max-vw-val - $min-vw-val);
+  $intercept: $min-val - ($slope * $min-vw-val);
+
+  $slope-vw: $slope * 100;
+
+  @return clamp(#{$min}, #{$intercept}rem + #{$slope-vw}vw, #{$max});
+}
+
+/// Gera tipografia fluida
+/// @param {Number} $min-size - Tamanho mínimo da fonte
+/// @param {Number} $max-size - Tamanho máximo da fonte
+/// @return {String} - Valor CSS clamp()
+@function fluid-type($min-size, $max-size) {
+  @return fluid($min-size, $max-size, 320px, 1200px);
+}
+
+/// Gera espaçamento fluido
+/// @param {Number} $min-space - Espaçamento mínimo
+/// @param {Number} $max-space - Espaçamento máximo
+/// @return {String} - Valor CSS clamp()
+@function fluid-space($min-space, $max-space) {
+  @return fluid($min-space, $max-space, 375px, 1440px);
+}
+
+/// Cria uma cor com transparência a partir de uma variável CSS
+/// Nota: Esta função só funciona com valores SCSS, não CSS vars
+/// @param {Color} $color - Cor base
+/// @param {Number} $alpha - Valor de opacidade (0-1)
+/// @return {Color} - Cor com transparência
+@function alpha($color, $alpha) {
+  @return color.change($color, $alpha: $alpha);
+}
+
+/// Clareia uma cor
+/// @param {Color} $color - Cor base
+/// @param {Number} $amount - Quantidade (0-100%)
+/// @return {Color} - Cor clareada
+@function tint($color, $amount) {
+  @return color.mix(white, $color, $amount);
+}
+
+/// Escurece uma cor
+/// @param {Color} $color - Cor base
+/// @param {Number} $amount - Quantidade (0-100%)
+/// @return {Color} - Cor escurecida
+@function shade($color, $amount) {
+  @return color.mix(black, $color, $amount);
+}
+
+/// Ajusta o brilho de uma cor
+/// @param {Color} $color - Cor base
+/// @param {Number} $amount - Quantidade positiva (clareia) ou negativa (escurece)
+/// @return {Color} - Cor ajustada
+@function adjust-brightness($color, $amount) {
+  @if $amount >0 {
+    @return tint($color, $amount);
+  }
+
+  @else {
+    @return shade($color, math.abs($amount));
+  }
+}
+
+/// Gera uma cor de hover (mais clara)
+/// @param {Color} $color - Cor base
+/// @return {Color} - Cor de hover
+@function hover-color($color) {
+  @return color.adjust($color, $lightness: 8%);
+}
+
+/// Gera uma cor de active (mais escura)
+/// @param {Color} $color - Cor base
+/// @return {Color} - Cor de active
+@function active-color($color) {
+  @return color.adjust($color, $lightness: -5%);
+}
+
+/// Gera uma cor de focus (glow)
+/// @param {Color} $color - Cor base
+/// @return {Color} - Cor para focus ring
+@function focus-color($color) {
+  @return color.change($color, $alpha: 0.4);
+}
+
+/// Multiplica o espaçamento base
+/// @param {Number} $multiplier - Multiplicador
+/// @param {Number} $base=0.25rem - Espaçamento base
+/// @return {Number} - Espaçamento calculado
+@function space($multiplier, $base: 0.25rem) {
+  @return $multiplier * $base;
+}
+
+/// Calcula padding shorthand
+/// @param {List} $values - Lista de valores (1-4)
+/// @return {List} - Valores de padding
+@function spacing($values...) {
+  @return $values;
+}
+
+/// Calcula a largura percentual
+/// @param {Number} $columns - Número de colunas ocupadas
+/// @param {Number} $total=12 - Total de colunas
+/// @return {Number} - Largura em porcentagem
+@function col-width($columns, $total: 12) {
+  @return math.percentage(math.div($columns, $total));
+}
+
+/// Calcula aspect ratio
+/// @param {Number} $width - Largura
+/// @param {Number} $height - Altura
+/// @return {Number} - Percentual para padding-top trick
+@function aspect-ratio($width, $height) {
+  @return math.percentage(math.div($height, $width));
+}
+
+/// Substitui uma substring em uma string
+/// @param {String} $string - String original
+/// @param {String} $search - Substring a ser substituída
+/// @param {String} $replace [''] - Substring substituta
+/// @return {String} - String modificada
+@function str-replace($string, $search, $replace: '') {
+  $index: string.index($string, $search);
+
+  @if $index {
+    @return string.slice($string, 1, $index - 1)+$replace +str-replace(string.slice($string, $index + string.length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
+
+/// Mapa de z-index
+$z-layers: (
+  'base': 0,
+  'dropdown': 1000,
+  'sticky': 1020,
+  'fixed': 1030,
+  'modal-backdrop': 1040,
+  'modal': 1050,
+  'popover': 1060,
+  'tooltip': 1070,
+  'toast': 1080
+);
+
+/// Obtém z-index do mapa
+/// @param {String} $layer - Nome da camada
+/// @return {Number} - Valor do z-index
+@function z($layer) {
+  @if map.has-key($z-layers, $layer) {
+    @return map.get($z-layers, $layer);
+  }
+
+  @warn "Unknown z-index layer: #{$layer}";
+  @return 0;
+}
+
+/// Gera uma sombra elevada
+/// @param {Number} $level - Nível de elevação (1-5)
+/// @param {Color} $color=black - Cor da sombra
+/// @return {String} - Valor da box-shadow
+@function elevation($level, $color: black) {
+  $shadows: (
+    1: (0 1px 2px alpha($color, 0.1)),
+    2: (0 2px 4px alpha($color, 0.1), 0 1px 2px alpha($color, 0.06)),
+    3: (0 4px 8px alpha($color, 0.12), 0 2px 4px alpha($color, 0.08)),
+    4: (0 8px 16px alpha($color, 0.14), 0 4px 8px alpha($color, 0.1)),
+    5: (0 16px 32px alpha($color, 0.16), 0 8px 16px alpha($color, 0.12))
+  );
+
+@if map.has-key($shadows, $level) {
+  @return map.get($shadows, $level);
+}
+
+@return none;
+}

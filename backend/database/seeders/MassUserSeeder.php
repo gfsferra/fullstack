@@ -4,12 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 /**
  * Seeder para popular o banco com grande volume de usuários.
- * Otimizado para inserção de milhões de registros.
+ * Otimizado para inserção com baixo consumo de memória.
  * 
  * @package Database\Seeders
  */
@@ -21,12 +19,14 @@ class MassUserSeeder extends Seeder
     private const TOTAL_RECORDS = 150_000;
 
     /**
-     * Tamanho do batch para inserção
+     * Tamanho do batch para inserção (reduzido para economizar memória)
      */
-    private const BATCH_SIZE = 5000;
+    private const BATCH_SIZE = 1000;
 
     /**
      * Nomes brasileiros para geração
+     * 
+     * @var array<int, string> Nomes brasileiros
      */
     private array $firstNames = [
         'João', 'Maria', 'José', 'Ana', 'Pedro', 'Paulo', 'Lucas', 'Gabriel', 
@@ -54,75 +54,62 @@ class MassUserSeeder extends Seeder
 
     /**
      * Executa o seeder.
+     * 
+     * @return void
      */
     public function run(): void
     {
-        $this->command->info('🚀 Iniciando inserção de ' . number_format(self::TOTAL_RECORDS, 0, ',', '.') . ' registros...');
-        $this->command->info('📦 Tamanho do batch: ' . number_format(self::BATCH_SIZE, 0, ',', '.'));
+        $this->command->info('Iniciando inserção de ' . number_format(self::TOTAL_RECORDS, 0, ',', '.') . ' registros...');
+        $this->command->info('Tamanho do batch: ' . number_format(self::BATCH_SIZE, 0, ',', '.'));
         
-        // Desabilitar verificações para acelerar
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::statement('SET UNIQUE_CHECKS=0');
         DB::statement('SET AUTOCOMMIT=0');
         
-        // Desabilitar índices temporariamente
-        $this->command->info('⏸️  Desabilitando índices...');
+        $this->command->info('Desabilitando índices...');
         DB::statement('ALTER TABLE users DISABLE KEYS');
         
-        $totalBatches = ceil(self::TOTAL_RECORDS / self::BATCH_SIZE);
+        $totalBatches = (int) ceil(self::TOTAL_RECORDS / self::BATCH_SIZE);
         $inserted = 0;
         $startTime = microtime(true);
+        $now = date('Y-m-d H:i:s');
         
         $this->command->getOutput()->progressStart($totalBatches);
+        
+        DB::statement('START TRANSACTION');
         
         for ($batch = 0; $batch < $totalBatches; $batch++) {
             $records = [];
             $batchSize = min(self::BATCH_SIZE, self::TOTAL_RECORDS - $inserted);
             
             for ($i = 0; $i < $batchSize; $i++) {
-                $records[] = $this->generateUser($inserted + $i);
+                $records[] = $this->generateUser($inserted + $i, $now);
             }
             
             DB::table('users')->insert($records);
             $inserted += $batchSize;
             
-            // Commit a cada 50 batches
-            if ($batch % 50 === 0) {
+            // Commit a cada 10 batches para evitar lock
+            if ($batch % 10 === 0) {
                 DB::statement('COMMIT');
                 DB::statement('START TRANSACTION');
+                gc_collect_cycles(); // Libera memória
             }
             
             $this->command->getOutput()->progressAdvance();
             
-            // Liberar memória
+            // Limpa memória
+            $records = null;
             unset($records);
-            
-            // Log a cada 1 milhão
-            if ($inserted % 1_000_000 === 0) {
-                $elapsed = microtime(true) - $startTime;
-                $rate = $inserted / $elapsed;
-                $remaining = (self::TOTAL_RECORDS - $inserted) / $rate;
-                
-                $this->command->newLine();
-                $this->command->info(sprintf(
-                    '📊 Progresso: %s registros (%.1f%%) | %.0f reg/s | Tempo restante: %s',
-                    number_format($inserted, 0, ',', '.'),
-                    ($inserted / self::TOTAL_RECORDS) * 100,
-                    $rate,
-                    $this->formatTime($remaining)
-                ));
-            }
         }
         
         DB::statement('COMMIT');
         
         $this->command->getOutput()->progressFinish();
         
-        // Reabilitar índices
-        $this->command->info('▶️  Reabilitando índices (pode demorar)...');
+        $this->command->info('Reabilitando índices (pode demorar)...');
         DB::statement('ALTER TABLE users ENABLE KEYS');
         
-        // Restaurar configurações
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
         DB::statement('SET UNIQUE_CHECKS=1');
         DB::statement('SET AUTOCOMMIT=1');
@@ -130,9 +117,9 @@ class MassUserSeeder extends Seeder
         $totalTime = microtime(true) - $startTime;
         
         $this->command->newLine();
-        $this->command->info('✅ Concluído!');
+        $this->command->info('Concluído!');
         $this->command->info(sprintf(
-            '📈 Total: %s registros em %s (%.0f reg/s)',
+            'Total: %s registros em %s (%.0f reg/s)',
             number_format($inserted, 0, ',', '.'),
             $this->formatTime($totalTime),
             $inserted / $totalTime
@@ -140,32 +127,23 @@ class MassUserSeeder extends Seeder
     }
 
     /**
-     * Gera um registro de usuário.
+     * Gera um registro de usuário (otimizado para memória).
      */
-    private function generateUser(int $index): array
+    private function generateUser(int $index, string $now): array
     {
-        $firstName = $this->firstNames[array_rand($this->firstNames)];
-        $lastName = $this->lastNames[array_rand($this->lastNames)];
-        $name = $firstName . ' ' . $lastName;
+        $firstName = $this->firstNames[$index % count($this->firstNames)];
+        $lastName = $this->lastNames[$index % count($this->lastNames)];
         
-        $email = strtolower(
-            $this->removeAccents($firstName) . 
-            '.' . 
-            $this->removeAccents($lastName) . 
-            $index . 
-            '@' . 
-            $this->emailDomains[array_rand($this->emailDomains)]
-        );
-        
-        $now = Carbon::now();
-        $birthDate = Carbon::now()->subYears(rand(18, 70))->subDays(rand(0, 365));
+        $year = rand(1954, 2006);
+        $month = str_pad((string) rand(1, 12), 2, '0', STR_PAD_LEFT);
+        $day = str_pad((string) rand(1, 28), 2, '0', STR_PAD_LEFT);
         
         return [
-            'name' => $name,
-            'email' => $email,
-            'birth_date' => $birthDate->format('Y-m-d'),
+            'name' => $firstName . ' ' . $lastName,
+            'email' => strtolower($this->removeAccents($firstName) . '.' . $this->removeAccents($lastName) . $index . '@' . $this->emailDomains[$index % count($this->emailDomains)]),
+            'birth_date' => "{$year}-{$month}-{$day}",
             'cpf' => $this->generateCpf(),
-            'google_id' => rand(0, 1) ? (string) rand(100000000000000000, 999999999999999999) : null,
+            'google_id' => null,
             'avatar' => null,
             'google_token' => null,
             'registration_completed' => true,
@@ -175,7 +153,9 @@ class MassUserSeeder extends Seeder
     }
 
     /**
-     * Gera um CPF aleatório (apenas números).
+     * Gera um CPF aleatório.
+     * 
+     * @return string CPF aleatório
      */
     private function generateCpf(): string
     {
@@ -184,6 +164,9 @@ class MassUserSeeder extends Seeder
 
     /**
      * Remove acentos de uma string.
+     * 
+     * @param string $string String com acentos
+     * @return string String sem acentos
      */
     private function removeAccents(string $string): string
     {
@@ -207,6 +190,9 @@ class MassUserSeeder extends Seeder
 
     /**
      * Formata segundos em tempo legível.
+     * 
+     * @param float $seconds Segundos
+     * @return string Tempo legível
      */
     private function formatTime(float $seconds): string
     {
