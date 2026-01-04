@@ -5,12 +5,12 @@ services:
     container_name: cadastro_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_DATABASE:-users}
-      MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-rdM4E8nuC1QVi8hn}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3307:3306"
+      - "${MYSQL_PORT:-3307}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -27,7 +27,7 @@ services:
     container_name: cadastro_redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     networks:
       - cadastro_network
     healthcheck:
@@ -48,32 +48,35 @@ services:
       - ./backend:/var/www
       - backend_vendor:/var/www/vendor
     environment:
-      APP_NAME: "Sistema de Cadastro"
-      APP_ENV: local
-      APP_DEBUG: "true"
-      APP_URL: http://localhost:8000
-      FRONTEND_URL: http://localhost:5173
+      APP_NAME: ${APP_NAME:-Sistema de Cadastro}
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: ${APP_URL:-http://localhost:8000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-users}
-      DB_USERNAME: ${DB_USERNAME:-laravel}
-      DB_PASSWORD: ${DB_PASSWORD:-rdM4E8nuC1QVi8hn}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       REDIS_HOST: redis
-      REDIS_PREFIX: "laravel-database-"
+      REDIS_PREFIX: ${REDIS_PREFIX:-laravel-database-}
       QUEUE_CONNECTION: redis
       CACHE_DRIVER: redis
       SESSION_DRIVER: redis
       MAIL_MAILER: ${MAIL_MAILER:-smtp}
-      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT:-587}
-      MAIL_USERNAME: ${MAIL_USERNAME:-gfsferra35@gmail.com}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-vkho dsiu qjiv phmy}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
-      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-gfsferra35@gmail.com}
-      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Fullstack service}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Sistema de Cadastro}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:8000/api/auth/google/callback}
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     depends_on:
       mysql:
         condition: service_healthy
@@ -95,26 +98,26 @@ services:
       - ./backend:/var/www
       - backend_vendor:/var/www/vendor
     environment:
-      APP_NAME: "Sistema de Cadastro"
-      APP_ENV: local
+      APP_NAME: ${APP_NAME:-Sistema de Cadastro}
+      APP_ENV: ${APP_ENV:-local}
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-users}
-      DB_USERNAME: ${DB_USERNAME:-laravel}
-      DB_PASSWORD: ${DB_PASSWORD:-rdM4E8nuC1QVi8hn}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       REDIS_HOST: redis
-      REDIS_PREFIX: "laravel-database-"
+      REDIS_PREFIX: ${REDIS_PREFIX:-laravel-database-}
       QUEUE_CONNECTION: redis
       CACHE_STORE: redis
       MAIL_MAILER: ${MAIL_MAILER:-smtp}
-      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT:-587}
-      MAIL_USERNAME: ${MAIL_USERNAME:-gfsferra35@gmail.com}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-vkho dsiu qjiv phmy}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
-      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-gfsferra35@gmail.com}
-      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Fullstack service}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Sistema de Cadastro}
     depends_on:
       mysql:
         condition: service_healthy
@@ -140,9 +143,9 @@ services:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-5173}:5173"
     environment:
-      VITE_API_BASE_URL: http://localhost:8000/api
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api}
     depends_on:
       - backend
     networks:

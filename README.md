@@ -108,11 +108,16 @@ GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google/callback
 git clone <url-do-repositorio>
 cd fullstack
 
-# 2. Copie o arquivo de ambiente do backend
-cp backend/.env.example backend/.env
+# 2. Configure as variáveis de ambiente do Docker
+cp .env.example .env
+# Edite o arquivo .env com suas credenciais:
+# - Senhas do banco de dados
+# - Credenciais do Gmail SMTP
+# - Client ID e Secret do Google OAuth
 
-# 3. Configure as variáveis do Google OAuth no backend/.env
-# (veja seção anterior)
+# 3. Copie o arquivo de ambiente do backend
+cp backend/.env.example backend/.env
+# Edite com as mesmas credenciais do passo anterior
 
 # 4. Inicie os containers
 docker compose up -d
@@ -123,6 +128,8 @@ docker compose exec backend php artisan migrate
 # 6. (Opcional) Popule o banco com dados de teste
 docker compose exec backend php artisan db:seed
 ```
+
+> ⚠️ **Importante**: Nunca commite arquivos `.env` com credenciais reais. Apenas os arquivos `.env.example` devem estar no repositório.
 
 **Acessos:**
 - 🌐 Frontend: http://localhost:5173
