@@ -5,10 +5,10 @@ services:
     container_name: cadastro_mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: users
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: rdM4E8nuC1QVi8hn
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE:-users}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-rdM4E8nuC1QVi8hn}
     ports:
       - "3307:3306"
     volumes:
@@ -30,6 +30,11 @@ services:
       - "6379:6379"
     networks:
       - cadastro_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   # Laravel Backend
   backend:
@@ -51,20 +56,29 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: users
-      DB_USERNAME: laravel
-      DB_PASSWORD: rdM4E8nuC1QVi8hn
+      DB_DATABASE: ${DB_DATABASE:-users}
+      DB_USERNAME: ${DB_USERNAME:-laravel}
+      DB_PASSWORD: ${DB_PASSWORD:-rdM4E8nuC1QVi8hn}
       REDIS_HOST: redis
+      REDIS_PREFIX: "laravel-database-"
       QUEUE_CONNECTION: redis
       CACHE_DRIVER: redis
       SESSION_DRIVER: redis
+      MAIL_MAILER: ${MAIL_MAILER:-smtp}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-gfsferra35@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-vkho dsiu qjiv phmy}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-gfsferra35@gmail.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Fullstack service}
     ports:
       - "8000:8000"
     depends_on:
       mysql:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     networks:
       - cadastro_network
 
@@ -74,9 +88,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: cadastro_queue
-    restart: unless-stopped
+    restart: always
     working_dir: /var/www
-    command: php artisan queue:work redis --tries=3 --timeout=90
+    command: sh -c "sleep 5 && php artisan queue:listen redis --queue=default --tries=3 --timeout=60 --sleep=1 --memory=128"
     volumes:
       - ./backend:/var/www
       - backend_vendor:/var/www/vendor
@@ -86,15 +100,34 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_DATABASE: users
-      DB_USERNAME: laravel
-      DB_PASSWORD: rdM4E8nuC1QVi8hn
+      DB_DATABASE: ${DB_DATABASE:-users}
+      DB_USERNAME: ${DB_USERNAME:-laravel}
+      DB_PASSWORD: ${DB_PASSWORD:-rdM4E8nuC1QVi8hn}
       REDIS_HOST: redis
+      REDIS_PREFIX: "laravel-database-"
       QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      MAIL_MAILER: ${MAIL_MAILER:-smtp}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-gfsferra35@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-vkho dsiu qjiv phmy}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-gfsferra35@gmail.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Fullstack service}
     depends_on:
-      - backend
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - cadastro_network
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan queue:monitor redis:default || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   # Vue.js Frontend
   frontend:
@@ -123,5 +156,3 @@ volumes:
   mysql_data:
   backend_vendor:
   frontend_node_modules:
-
-

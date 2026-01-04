@@ -1,36 +1,67 @@
 <script setup lang="ts">
 /**
  * UserFilters - Componente de filtros para lista de usuários
- * Implementa debounce para otimização de buscas em grandes volumes
+ * Implementa debounce com VueUse para otimização de buscas em grandes volumes
  */
-import { ref, watch } from 'vue';
+import { ref, computed } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import type { UserFilters } from '@/stores/userStore';
+
+interface Props {
+  /** Indica se está carregando dados */
+  loading?: boolean;
+}
 
 interface Emits {
   (e: 'filter', filters: UserFilters): void;
   (e: 'clear'): void;
 }
 
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+});
+
 const emit = defineEmits<Emits>();
 
 const name = ref('');
 const cpf = ref('');
-let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+const isTyping = ref(false);
+
+/** Indica se está em processo de busca (digitando ou carregando) */
+const isSearching = computed(() => isTyping.value || props.loading);
 
 /**
- * Debounce de 300ms para evitar requisições excessivas
+ * Emite o filtro após debounce
  */
-function debounceFilter(): void {
-  if (debounceTimeout) {
-    clearTimeout(debounceTimeout);
-  }
-  
-  debounceTimeout = setTimeout(() => {
-    emit('filter', {
-      name: name.value || undefined,
-      cpf: cpf.value || undefined,
-    });
-  }, 300);
+function emitFilter(): void {
+  isTyping.value = false;
+  emit('filter', {
+    name: name.value || undefined,
+    cpf: cpf.value || undefined,
+  });
+}
+
+/**
+ * Debounce de 400ms para evitar requisições excessivas
+ * Usa useDebounceFn do VueUse para código mais limpo
+ */
+const debouncedFilter = useDebounceFn(emitFilter, 400);
+
+/**
+ * Dispara busca com indicador de digitação
+ */
+function triggerSearch(): void {
+  isTyping.value = true;
+  debouncedFilter();
+}
+
+/**
+ * Handler para input de nome
+ */
+function onNameInput(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  name.value = input.value;
+  triggerSearch();
 }
 
 /**
@@ -53,7 +84,7 @@ function formatCpf(event: Event): void {
   }
 
   cpf.value = value;
-  debounceFilter();
+  triggerSearch();
 }
 
 /**
@@ -62,13 +93,9 @@ function formatCpf(event: Event): void {
 function clearFilters(): void {
   name.value = '';
   cpf.value = '';
+  isTyping.value = false;
   emit('clear');
 }
-
-// Watch para mudanças no nome
-watch(name, () => {
-  debounceFilter();
-});
 </script>
 
 <template>
@@ -76,34 +103,49 @@ watch(name, () => {
     <div class="user-filters__fields">
       <div class="user-filters__field">
         <label for="filter-name">Nome</label>
-        <input
-          id="filter-name"
-          v-model="name"
-          type="text"
-          placeholder="Buscar por nome..."
-        />
+        <div class="user-filters__input-wrapper">
+          <input
+            id="filter-name"
+            :value="name"
+            @input="onNameInput"
+            type="text"
+            placeholder="Buscar por nome..."
+            :class="{ 'is-searching': isSearching }"
+          />
+          <span v-if="isSearching && name" class="user-filters__spinner" aria-label="Buscando..."></span>
+        </div>
       </div>
 
       <div class="user-filters__field">
         <label for="filter-cpf">CPF</label>
-        <input
-          id="filter-cpf"
-          :value="cpf"
-          @input="formatCpf"
-          type="text"
-          placeholder="000.000.000-00"
-          maxlength="14"
-        />
+        <div class="user-filters__input-wrapper">
+          <input
+            id="filter-cpf"
+            :value="cpf"
+            @input="formatCpf"
+            type="text"
+            placeholder="000.000.000-00"
+            maxlength="14"
+            :class="{ 'is-searching': isSearching }"
+          />
+          <span v-if="isSearching && cpf" class="user-filters__spinner" aria-label="Buscando..."></span>
+        </div>
       </div>
 
-      <button
-        v-if="name || cpf"
-        class="btn btn--secondary user-filters__clear"
-        @click="clearFilters"
-        type="button"
-      >
-        Limpar
-      </button>
+      <div class="user-filters__actions">
+        <span v-if="isSearching" class="user-filters__status">
+          Buscando...
+        </span>
+        <button
+          v-if="name || cpf"
+          class="btn btn--secondary user-filters__clear"
+          @click="clearFilters"
+          type="button"
+          :disabled="isSearching"
+        >
+          Limpar
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -140,11 +182,64 @@ watch(name, () => {
 
     input {
       width: 100%;
+      transition: border-color 0.2s ease;
+
+      &.is-searching {
+        border-color: $color-mauve;
+      }
     }
   }
 
-  &__clear {
+  &__input-wrapper {
+    position: relative;
+  }
+
+  &__spinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: $color-mauve;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
     flex-shrink: 0;
+  }
+
+  &__status {
+    font-size: $font-size-sm;
+    color: $color-mauve;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  &__clear {
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }
 </style>

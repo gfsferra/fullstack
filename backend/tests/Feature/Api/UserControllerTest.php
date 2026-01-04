@@ -21,7 +21,7 @@ class UserControllerTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Testa GET /api/users retorna lista de usuários.
+     * Testa GET /api/users retorna lista de usuários paginada.
      *
      * @return void
      */
@@ -32,7 +32,13 @@ class UserControllerTest extends TestCase
         $response = $this->getJson('/api/users');
 
         $response->assertStatus(200)
-            ->assertJsonCount(3);
+            ->assertJsonStructure([
+                'data',
+                'current_page',
+                'total',
+                'per_page',
+            ])
+            ->assertJsonCount(3, 'data');
     }
 
     /**
@@ -45,7 +51,9 @@ class UserControllerTest extends TestCase
         $response = $this->getJson('/api/users');
 
         $response->assertStatus(200)
-            ->assertJsonCount(0);
+            ->assertJsonStructure(['data', 'total'])
+            ->assertJsonCount(0, 'data')
+            ->assertJsonFragment(['total' => 0]);
     }
 
     /**

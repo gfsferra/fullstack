@@ -50,6 +50,7 @@ async function handleClearFilters(): Promise<void> {
           <div class="card__body">
             <!-- Filtros -->
             <UserFiltersComponent
+              :loading="userStore.loading"
               @filter="handleFilter"
               @clear="handleClearFilters"
             />

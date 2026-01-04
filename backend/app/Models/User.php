@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $google_id
  * @property string|null $avatar
  * @property string|null $google_token
+ * @property string|null $google_refresh_token
+ * @property Carbon|null $google_token_expires_at
  * @property bool $registration_completed
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -56,6 +58,8 @@ class User extends Model
         'google_id',
         'avatar',
         'google_token',
+        'google_refresh_token',
+        'google_token_expires_at',
         'registration_completed',
     ];
 
@@ -66,6 +70,7 @@ class User extends Model
      */
     protected $hidden = [
         'google_token',
+        'google_refresh_token',
     ];
 
     /**
@@ -77,6 +82,7 @@ class User extends Model
         'birth_date' => 'date',
         'registration_completed' => 'boolean',
         'cpf' => CpfCast::class,
+        'google_token_expires_at' => 'datetime',
     ];
 
     /**
