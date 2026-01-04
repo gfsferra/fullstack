@@ -17,6 +17,7 @@ Sistema fullstack de cadastro de usuários com autenticação Google OAuth 2.0, 
 - [Arquitetura e Decisões Técnicas](#-arquitetura-e-decisões-técnicas)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 - [API Endpoints](#-api-endpoints)
+- [Coleção Bruno (API Client)](#-coleção-bruno-api-client)
 
 ---
 
@@ -383,6 +384,65 @@ fullstack/
 
 ```
 GET /api/users?search=nome&per_page=10&page=1
+```
+
+---
+
+## 🔧 Coleção Bruno (API Client)
+
+O projeto inclui uma coleção [Bruno](https://www.usebruno.com/) para testar a API.
+
+### Instalação do Bruno
+
+```bash
+# Via npm
+npm install -g @usebruno/cli
+
+# Ou baixe o app: https://www.usebruno.com/downloads
+```
+
+### Estrutura da Coleção
+
+```
+bruno/
+├── bruno.json              # Configuração da coleção
+├── collection.bru          # Headers globais
+├── environments/
+│   └── local.bru           # Variáveis de ambiente (localhost)
+├── auth/
+│   ├── google-redirect.bru # Iniciar OAuth
+│   ├── google-callback.bru # Callback OAuth
+│   ├── get-user.bru        # Usuário autenticado
+│   └── logout.bru          # Encerrar sessão
+├── registration/
+│   ├── complete.bru        # Completar cadastro
+│   └── status.bru          # Status do cadastro
+└── users/
+    ├── list.bru            # Listar usuários
+    ├── show.bru            # Detalhes do usuário
+    ├── store.bru           # Criar usuário
+    ├── update.bru          # Atualizar usuário
+    └── delete.bru          # Remover usuário
+```
+
+### Como Usar
+
+1. Abra o Bruno
+2. Clique em **Open Collection**
+3. Navegue até a pasta `fullstack/bruno`
+4. Selecione o ambiente **local** no canto superior direito
+5. Execute as requisições!
+
+### Via CLI
+
+```bash
+cd bruno
+
+# Executar todas as requisições
+bru run --env local
+
+# Executar uma requisição específica
+bru run users/list.bru --env local
 ```
 
 ---

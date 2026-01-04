@@ -1,0 +1,75 @@
+meta {
+  name: Complete Registration
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/registration/complete
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "user_id": 123,
+    "name": "Gabriel Sferra",
+    "birth_date": "1990-05-15",
+    "cpf": "245.627.390-70"
+  }
+}
+
+docs {
+  # Complete Registration
+  
+  Completa o cadastro do usuário após autenticação via Google OAuth.
+  
+  ## Body (JSON)
+  
+  | Campo | Tipo | Obrigatório | Descrição |
+  |-------|------|-------------|-----------|
+  | user_id | integer | Sim | ID do usuário |
+  | name | string | Sim | Nome completo |
+  | birth_date | string | Sim | Data de nascimento (YYYY-MM-DD) |
+  | cpf | string | Sim | CPF (com ou sem formatação) |
+  
+  ## Validações
+  
+  - **name**: Obrigatório, máximo 255 caracteres
+  - **birth_date**: Obrigatório, deve ser data válida anterior a hoje
+  - **cpf**: Obrigatório, validação matemática dos dígitos verificadores
+  
+  ## Resposta de Sucesso (200)
+  
+  ```json
+  {
+    "success": true,
+    "message": "Cadastro completado com sucesso",
+    "user": {
+      "id": 1,
+      "name": "Gabriel Sferra",
+      "email": "gabriel@email.com",
+      "cpf": "123.456.789-09",
+      "birth_date": "1990-05-15",
+      "registration_completed": true
+    }
+  }
+  ```
+  
+  ## Resposta de Erro (422)
+  
+  ```json
+  {
+    "message": "Os dados fornecidos são inválidos.",
+    "errors": {
+      "cpf": ["O CPF informado é inválido."],
+      "birth_date": ["A data de nascimento deve estar no formato válido (dd/mm/aaaa)."]
+    }
+  }
+  ```
+}

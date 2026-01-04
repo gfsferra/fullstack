@@ -1,0 +1,73 @@
+meta {
+  name: List Users
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+query {
+  ~search: Gabriel
+  ~cpf: 123.456.789-09
+  ~per_page: 10
+  ~page: 1
+}
+
+docs {
+  # List Users
+  
+  Lista todos os usuários cadastrados com paginação e filtros.
+  
+  ## Parâmetros (Query String)
+  
+  | Parâmetro | Tipo | Obrigatório | Descrição |
+  |-----------|------|-------------|-----------|
+  | search | string | Não | Filtro por nome, email ou CPF |
+  | cpf | string | Não | Filtro específico por CPF |
+  | per_page | integer | Não | Itens por página (padrão: 15, máx: 100) |
+  | page | integer | Não | Número da página (padrão: 1) |
+  
+  ## Resposta de Sucesso (200)
+  
+  ```json
+  {
+    "data": [
+      {
+        "id": 1,
+        "name": "Gabriel Sferra",
+        "email": "gabriel@email.com",
+        "cpf": "123.456.789-09",
+        "birth_date": "1990-05-15",
+        "age": 34,
+        "avatar": "https://lh3.googleusercontent.com/...",
+        "registration_completed": true,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "links": {
+      "first": "http://localhost:8000/api/users?page=1",
+      "last": "http://localhost:8000/api/users?page=10",
+      "prev": null,
+      "next": "http://localhost:8000/api/users?page=2"
+    },
+    "meta": {
+      "current_page": 1,
+      "from": 1,
+      "last_page": 10,
+      "per_page": 15,
+      "to": 15,
+      "total": 150
+    }
+  }
+  ```
+}
+

@@ -1,0 +1,51 @@
+meta {
+  name: Registration Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/registration/status/1
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # Registration Status
+  
+  Verifica o status de cadastro de um usuário.
+  
+  ## Parâmetros (URL)
+  
+  | Parâmetro | Tipo | Descrição |
+  |-----------|------|-----------|
+  | userId | integer | ID do usuário |
+  
+  ## Resposta de Sucesso (200)
+  
+  ```json
+  {
+    "completed": true,
+    "user": {
+      "id": 1,
+      "name": "Gabriel Sferra",
+      "email": "gabriel@email.com",
+      "registration_completed": true
+    }
+  }
+  ```
+  
+  ## Resposta - Usuário Não Encontrado (200)
+  
+  ```json
+  {
+    "completed": false,
+    "user": null
+  }
+  ```
+}
+
