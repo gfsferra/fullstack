@@ -1,0 +1,39 @@
+meta {
+  name: Delete User
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/users/7
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # Delete User
+  
+  Remove um usuário do sistema.
+  
+  ## Parâmetros (URL)
+  
+  | Parâmetro | Tipo | Descrição |
+  |-----------|------|-----------|
+  | id | integer | ID do usuário |
+  
+  ## Resposta de Sucesso (204)
+  
+  Sem conteúdo (No Content).
+  
+  ## Resposta - Não Encontrado (404)
+  
+  ```json
+  {
+    "message": "Usuário não encontrado"
+  }
+  ```
+}

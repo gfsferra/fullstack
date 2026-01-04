@@ -1,0 +1,55 @@
+meta {
+  name: Show User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/users/1
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # Show User
+  
+  Retorna os detalhes de um usuário específico.
+  
+  ## Parâmetros (URL)
+  
+  | Parâmetro | Tipo | Descrição |
+  |-----------|------|-----------|
+  | id | integer | ID do usuário |
+  
+  ## Resposta de Sucesso (200)
+  
+  ```json
+  {
+    "data": {
+      "id": 1,
+      "name": "Gabriel Sferra",
+      "email": "gabriel@email.com",
+      "cpf": "123.456.789-09",
+      "birth_date": "1990-05-15",
+      "age": 34,
+      "avatar": "https://lh3.googleusercontent.com/...",
+      "registration_completed": true,
+      "created_at": "2024-01-01T00:00:00.000000Z",
+      "updated_at": "2024-01-01T00:00:00.000000Z"
+    }
+  }
+  ```
+  
+  ## Resposta - Não Encontrado (404)
+  
+  ```json
+  {
+    "message": "Usuário não encontrado"
+  }
+  ```
+}
+

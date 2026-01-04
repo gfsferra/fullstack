@@ -154,27 +154,93 @@ class UserService
      */
     protected function validateUserData(array $data, ?int $userId = null): void
     {
+        // Normaliza CPF para validação (remove formatação)
+        $cpfClean = isset($data['cpf']) ? preg_replace('/[^0-9]/', '', $data['cpf']) : null;
+
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email' . ($userId ? ',' . $userId : ''),
             'birth_date' => 'nullable|date',
-            'cpf' => 'nullable|string|size:14|unique:users,cpf' . ($userId ? ',' . $userId : ''),
+            'cpf' => 'nullable|string',
         ];
 
         $messages = [
             'name.required' => 'O nome é obrigatório.',
+            'name.string' => 'O nome deve ser um texto válido.',
+            'name.max' => 'O nome não pode ter mais de 255 caracteres.',
             'email.required' => 'O e-mail é obrigatório.',
             'email.email' => 'O e-mail deve ser válido.',
             'email.unique' => 'Este e-mail já está cadastrado.',
-            'cpf.size' => 'O CPF deve ter 14 caracteres.',
-            'cpf.unique' => 'Este CPF já está cadastrado.',
+            'birth_date.date' => 'A data de nascimento deve ser uma data válida.',
         ];
 
         $validator = Validator::make($data, $rules, $messages);
 
+        // Validação customizada para CPF
+        $validator->after(function ($validator) use ($cpfClean, $userId) {
+            if ($cpfClean) {
+                // Valida tamanho
+                if (strlen($cpfClean) !== 11) {
+                    $validator->errors()->add('cpf', 'O CPF deve ter 11 dígitos.');
+                    return;
+                }
+
+                // Valida dígitos verificadores
+                if (!$this->validateCpfDigits($cpfClean)) {
+                    $validator->errors()->add('cpf', 'O CPF informado é inválido.');
+                    return;
+                }
+
+                // Valida unicidade
+                $existingUser = User::where('cpf', $cpfClean)
+                    ->when($userId, fn($q) => $q->where('id', '!=', $userId))
+                    ->first();
+
+                if ($existingUser) {
+                    $validator->errors()->add('cpf', 'Este CPF já está cadastrado.');
+                }
+            }
+        });
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
+    }
+
+    /**
+     * Valida os dígitos verificadores do CPF.
+     *
+     * @param string $cpf CPF apenas com números
+     * @return bool
+     */
+    protected function validateCpfDigits(string $cpf): bool
+    {
+        // Verifica se todos os dígitos são iguais
+        if (preg_match('/^(\d)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        // Calcula primeiro dígito verificador
+        $sum = 0;
+        for ($i = 0; $i < 9; $i++) {
+            $sum += intval($cpf[$i]) * (10 - $i);
+        }
+        $remainder = $sum % 11;
+        $digit1 = ($remainder < 2) ? 0 : 11 - $remainder;
+
+        if (intval($cpf[9]) !== $digit1) {
+            return false;
+        }
+
+        // Calcula segundo dígito verificador
+        $sum = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $sum += intval($cpf[$i]) * (11 - $i);
+        }
+        $remainder = $sum % 11;
+        $digit2 = ($remainder < 2) ? 0 : 11 - $remainder;
+
+        return intval($cpf[10]) === $digit2;
     }
 }
 
