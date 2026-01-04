@@ -141,21 +141,21 @@ class UserRepository implements UserRepositoryInterface
     {
         $query = $this->model->newQuery();
 
-        // Filtro por nome (busca parcial case-insensitive)
         if (!empty($filters['name'])) {
             $query->where('name', 'LIKE', '%' . $filters['name'] . '%');
         }
 
-        // Filtro por CPF (busca parcial, remove formatação)
         if (!empty($filters['cpf'])) {
             $cpfClean = preg_replace('/\D/', '', $filters['cpf']);
             $query->where('cpf', 'LIKE', '%' . $cpfClean . '%');
         }
 
-        // Índice para otimização: ordenar por ID (índice primário)
         $query->orderBy('id', 'desc');
 
-        return $query->paginate(perPage: $perPage, page: $page);
+        /** @var LengthAwarePaginator $paginated */
+        $paginated = $query->paginate(perPage: $perPage, page: $page);
+
+        return $paginated;
     }
 }
 

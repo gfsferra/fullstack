@@ -36,15 +36,12 @@ class CpfCast implements CastsAttributes
             return null;
         }
 
-        // Remove qualquer formatação existente
         $cpf = preg_replace('/[^0-9]/', '', $value);
 
-        // Se não tiver 11 dígitos, retorna como está
         if (strlen($cpf) !== 11) {
             return $value;
         }
 
-        // Formata: XXX.XXX.XXX-XX
         return sprintf(
             '%s.%s.%s-%s',
             substr($cpf, 0, 3),
@@ -71,7 +68,6 @@ class CpfCast implements CastsAttributes
             return null;
         }
 
-        // Remove tudo que não for número
         return preg_replace('/[^0-9]/', '', $value);
     }
 }

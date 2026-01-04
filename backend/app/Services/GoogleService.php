@@ -140,20 +140,17 @@ class GoogleService
      */
     public function getValidAccessToken(User $user): ?string
     {
-        // Se não tem token, não há o que fazer
         if (empty($user->google_token)) {
             Log::warning('Usuário não possui google_token', ['user_id' => $user->id]);
             return null;
         }
 
-        // Verifica se o token atual ainda é válido
         if ($this->isTokenValid($user->google_token)) {
             return $user->google_token;
         }
 
         Log::info('Token expirado, tentando refresh', ['user_id' => $user->id]);
 
-        // Token expirado - tenta refresh
         if (empty($user->google_refresh_token)) {
             Log::warning('Token expirado e não há refresh_token disponível', [
                 'user_id' => $user->id,
@@ -161,7 +158,6 @@ class GoogleService
             return null;
         }
 
-        // Tenta renovar o token
         $newTokenData = $this->refreshAccessToken($user->google_refresh_token);
 
         if (!$newTokenData || empty($newTokenData['access_token'])) {
@@ -169,7 +165,6 @@ class GoogleService
             return null;
         }
 
-        // Atualiza os tokens no banco de dados
         $updateData = [
             'google_token' => $newTokenData['access_token'],
             'google_token_expires_at' => isset($newTokenData['expires_in'])
@@ -177,7 +172,6 @@ class GoogleService
                 : null,
         ];
 
-        // Se veio um novo refresh token, atualiza também
         if (!empty($newTokenData['refresh_token'])) {
             $updateData['google_refresh_token'] = $newTokenData['refresh_token'];
         }
@@ -200,7 +194,6 @@ class GoogleService
         $accessToken = $this->getValidAccessToken($user);
 
         if (!$accessToken) {
-            // Fallback para o e-mail cadastrado
             return $user->email;
         }
 

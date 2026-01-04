@@ -1,26 +1,21 @@
 @use 'sass:color';
 
-// 1. Vendors
+// Vendors
 @forward 'vendors/google-button';
 
-// 2. Abstracts
+// Abstracts
 @forward 'abstracts/variables';
+@forward 'abstracts/functions';
 @forward 'abstracts/mixins';
 @forward 'abstracts/animations';
 @forward 'abstracts/utilities';
 
-// 3. Base
-@forward 'base/typography';
+// Base
 @forward 'base/reset';
+@forward 'base/typography';
 
-// 4. Layout
-
-// 5. Components
+// Components
 @forward 'components/buttons';
 @forward 'components/cards';
 @forward 'components/forms';
 @forward 'components/loading';
-
-// 6. Pages
-
-// 7. Themes

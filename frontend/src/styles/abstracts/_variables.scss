@@ -1,90 +1,274 @@
-// Colors (Catppuccin Mocha )
-$color-base: #1e1e2e;
-$color-surface: #181825;
-$color-overlay: #313244;
-$color-text: #cdd6f4;
-$color-subtext: #a6adc8;
-$color-lavender: #b4befe;
-$color-blue: #89b4fa;
-$color-sapphire: #74c7ec;
-$color-sky: #89dceb;
-$color-teal: #94e2d5;
-$color-green: #a6e3a1;
-$color-yellow: #f9e2af;
-$color-peach: #fab387;
-$color-maroon: #eba0ac;
-$color-red: #f38ba8;
-$color-mauve: #cba6f7;
-$color-pink: #f5c2e7;
-$color-flamingo: #f2cdcd;
-$color-rosewater: #f5e0dc;
+@use 'sass:color';
+@use 'sass:math';
 
-// State colors
-$color-success: $color-green;
-$color-warning: $color-yellow;
-$color-error: $color-red;
-$color-info: $color-blue;
+// Base palette - valores estáticos SCSS para compilação
+$_mocha-base: #1e1e2e;
+$_mocha-surface: #181825;
+$_mocha-overlay: #313244;
+$_mocha-text: #cdd6f4;
+$_mocha-subtext: #a6adc8;
+$_mocha-lavender: #b4befe;
+$_mocha-blue: #89b4fa;
+$_mocha-sapphire: #74c7ec;
+$_mocha-sky: #89dceb;
+$_mocha-teal: #94e2d5;
+$_mocha-green: #a6e3a1;
+$_mocha-yellow: #f9e2af;
+$_mocha-peach: #fab387;
+$_mocha-maroon: #eba0ac;
+$_mocha-red: #f38ba8;
+$_mocha-mauve: #cba6f7;
+$_mocha-pink: #f5c2e7;
+$_mocha-flamingo: #f2cdcd;
+$_mocha-rosewater: #f5e0dc;
+
+:root {
+  // Core colors
+  --color-base: #{$_mocha-base};
+  --color-surface: #{$_mocha-surface};
+  --color-overlay: #{$_mocha-overlay};
+  --color-text: #{$_mocha-text};
+  --color-subtext: #{$_mocha-subtext};
+
+  // Accent colors
+  --color-lavender: #{$_mocha-lavender};
+  --color-blue: #{$_mocha-blue};
+  --color-sapphire: #{$_mocha-sapphire};
+  --color-sky: #{$_mocha-sky};
+  --color-teal: #{$_mocha-teal};
+  --color-green: #{$_mocha-green};
+  --color-yellow: #{$_mocha-yellow};
+  --color-peach: #{$_mocha-peach};
+  --color-maroon: #{$_mocha-maroon};
+  --color-red: #{$_mocha-red};
+  --color-mauve: #{$_mocha-mauve};
+  --color-pink: #{$_mocha-pink};
+  --color-flamingo: #{$_mocha-flamingo};
+  --color-rosewater: #{$_mocha-rosewater};
+
+  // Semantic colors
+  --color-primary: var(--color-lavender);
+  --color-secondary: var(--color-mauve);
+  --color-success: var(--color-green);
+  --color-warning: var(--color-yellow);
+  --color-error: var(--color-red);
+  --color-info: var(--color-blue);
+
+  // Background colors
+  --bg-primary: var(--color-base);
+  --bg-secondary: var(--color-surface);
+  --bg-card: var(--color-overlay);
+  --bg-hover: #{rgba($_mocha-overlay, 0.7)};
+
+  // Border colors
+  --border-color: var(--color-overlay);
+  --border-focus: var(--color-lavender);
+
+  // Shadows
+  --shadow-color: 0deg 0% 0%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.1);
+  --shadow-md: 0 4px 6px -1px hsl(var(--shadow-color) / 0.15),
+    0 2px 4px -1px hsl(var(--shadow-color) / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(var(--shadow-color) / 0.2),
+    0 4px 6px -2px hsl(var(--shadow-color) / 0.1);
+  --shadow-xl: 0 20px 25px -5px hsl(var(--shadow-color) / 0.25),
+    0 10px 10px -5px hsl(var(--shadow-color) / 0.1);
+  --shadow-glow: 0 0 20px #{rgba($_mocha-lavender, 0.3)};
+  --shadow-inner: inset 0 2px 4px hsl(var(--shadow-color) / 0.1);
+
+  // Gradients
+  --gradient-primary: linear-gradient(135deg, var(--color-lavender), var(--color-mauve));
+  --gradient-accent: linear-gradient(135deg, var(--color-sapphire), var(--color-blue));
+  --gradient-warm: linear-gradient(135deg, var(--color-peach), var(--color-pink));
+  --gradient-cool: linear-gradient(135deg, var(--color-teal), var(--color-sapphire));
+  --gradient-surface: linear-gradient(180deg, var(--bg-secondary), var(--bg-primary));
+}
+
+// Expose as SCSS variables para uso em cálculos e mixins
+$color-base: var(--color-base);
+$color-surface: var(--color-surface);
+$color-overlay: var(--color-overlay);
+$color-text: var(--color-text);
+$color-subtext: var(--color-subtext);
+$color-lavender: var(--color-lavender);
+$color-blue: var(--color-blue);
+$color-sapphire: var(--color-sapphire);
+$color-sky: var(--color-sky);
+$color-teal: var(--color-teal);
+$color-green: var(--color-green);
+$color-yellow: var(--color-yellow);
+$color-peach: var(--color-peach);
+$color-maroon: var(--color-maroon);
+$color-red: var(--color-red);
+$color-mauve: var(--color-mauve);
+$color-pink: var(--color-pink);
+$color-flamingo: var(--color-flamingo);
+$color-rosewater: var(--color-rosewater);
+
+// Para cálculos que precisam de valores reais (não CSS vars)
+// Essas variáveis são exportadas para uso em mixins e componentes
+$color-base-raw: $_mocha-base;
+$color-lavender-raw: $_mocha-lavender;
+$color-red-raw: $_mocha-red;
+$color-overlay-raw: $_mocha-overlay;
+$color-subtext-raw: $_mocha-subtext;
+$color-mauve-raw: $_mocha-mauve;
+
+// Aliases para compatibilidade (privadas apenas dentro deste módulo)
+$_color-base: $color-base-raw;
+$_color-lavender: $color-lavender-raw;
+$_color-red: $color-red-raw;
+$_color-overlay: $color-overlay-raw;
+$_color-subtext: $color-subtext-raw;
+
+// State colors (aliases)
+$color-success: var(--color-success);
+$color-warning: var(--color-warning);
+$color-error: var(--color-error);
+$color-info: var(--color-info);
 
 // Background colors
-$bg-primary: $color-base;
-$bg-secondary: $color-surface;
-$bg-card: $color-overlay;
+$bg-primary: var(--bg-primary);
+$bg-secondary: var(--bg-secondary);
+$bg-card: var(--bg-card);
 
-$font-primary: 'JetBrains Mono', 'Fira Code', monospace;
-$font-secondary: 'Roboto', 'Inter', sans-serif;
+$font-primary: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+$font-secondary: 'Inter', 'Roboto', system-ui, sans-serif;
+$font-display: 'Space Grotesk', $font-secondary;
 
-$font-size-xs: 0.75rem;   // 12px
-$font-size-sm: 0.875rem;  // 14px
-$font-size-base: 1rem;    // 16px
-$font-size-lg: 1.125rem;  // 18px
-$font-size-xl: 1.25rem;   // 20px
-$font-size-2xl: 1.5rem;   // 24px
-$font-size-3xl: 1.875rem; // 30px
-$font-size-4xl: 2.25rem;  // 36px
+// Fluid typography scale (usando clamp para responsividade)
+:root {
+  --font-size-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem); // ~12px
+  --font-size-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem); // ~14px
+  --font-size-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem); // ~16px
+  --font-size-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); // ~18px
+  --font-size-xl: clamp(1.1rem, 1rem + 0.5vw, 1.25rem); // ~20px
+  --font-size-2xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem); // ~24px
+  --font-size-3xl: clamp(1.5rem, 1.25rem + 1.25vw, 1.875rem); // ~30px
+  --font-size-4xl: clamp(1.75rem, 1.5rem + 1.5vw, 2.25rem); // ~36px
+  --font-size-5xl: clamp(2rem, 1.75rem + 2vw, 3rem); // ~48px
+}
 
+$font-size-xs: var(--font-size-xs);
+$font-size-sm: var(--font-size-sm);
+$font-size-base: var(--font-size-base);
+$font-size-lg: var(--font-size-lg);
+$font-size-xl: var(--font-size-xl);
+$font-size-2xl: var(--font-size-2xl);
+$font-size-3xl: var(--font-size-3xl);
+$font-size-4xl: var(--font-size-4xl);
+$font-size-5xl: var(--font-size-5xl);
+
+// Font weights
 $font-weight-normal: 400;
 $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
 
+// Line heights
 $line-height-tight: 1.25;
+$line-height-snug: 1.375;
 $line-height-normal: 1.5;
-$line-height-relaxed: 1.75;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// Letter spacing
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
 
 $spacing-0: 0;
-$spacing-1: 0.25rem;  // 4px
-$spacing-2: 0.5rem;   // 8px
-$spacing-3: 0.75rem;  // 12px
-$spacing-4: 1rem;     // 16px
-$spacing-5: 1.25rem;  // 20px
-$spacing-6: 1.5rem;   // 24px
-$spacing-8: 2rem;     // 32px
-$spacing-10: 2.5rem;  // 40px
-$spacing-12: 3rem;    // 48px
-$spacing-16: 4rem;    // 64px
+$spacing-px: 1px;
+$spacing-0-5: 0.125rem; // 2px
+$spacing-1: 0.25rem; // 4px
+$spacing-1-5: 0.375rem; // 6px
+$spacing-2: 0.5rem; // 8px
+$spacing-2-5: 0.625rem; // 10px
+$spacing-3: 0.75rem; // 12px
+$spacing-3-5: 0.875rem; // 14px
+$spacing-4: 1rem; // 16px
+$spacing-5: 1.25rem; // 20px
+$spacing-6: 1.5rem; // 24px
+$spacing-7: 1.75rem; // 28px
+$spacing-8: 2rem; // 32px
+$spacing-9: 2.25rem; // 36px
+$spacing-10: 2.5rem; // 40px
+$spacing-11: 2.75rem; // 44px
+$spacing-12: 3rem; // 48px
+$spacing-14: 3.5rem; // 56px
+$spacing-16: 4rem; // 64px
+$spacing-20: 5rem; // 80px
+$spacing-24: 6rem; // 96px
 
-$border-radius-sm: 0.25rem;  // 4px
-$border-radius-md: 0.5rem;   // 8px
-$border-radius-lg: 0.75rem;  // 12px
-$border-radius-xl: 1rem;     // 16px
+$border-radius-none: 0;
+$border-radius-sm: 0.25rem; // 4px
+$border-radius-md: 0.5rem; // 8px
+$border-radius-lg: 0.75rem; // 12px
+$border-radius-xl: 1rem; // 16px
+$border-radius-2xl: 1.5rem; // 24px
+$border-radius-3xl: 2rem; // 32px
 $border-radius-full: 9999px;
 
+// Border
 $border-width: 1px;
-$border-color: $color-overlay;
+$border-width-2: 2px;
+$border-color: var(--border-color);
 
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+// Shadows
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
+$shadow-xl: var(--shadow-xl);
+$shadow-glow: var(--shadow-glow);
 
-$transition: all 0.2s ease-in-out;
+// Durations
+$duration-instant: 50ms;
+$duration-fast: 150ms;
+$duration-normal: 250ms;
+$duration-slow: 350ms;
+$duration-slower: 500ms;
+$duration-slowest: 700ms;
 
+// Easings (custom cubic-bezier for more natural feel)
+$ease-linear: linear;
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+$ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+// Transition presets
+$transition-fast: all $duration-fast $ease-out;
+$transition-normal: all $duration-normal $ease-out;
+$transition-slow: all $duration-slow $ease-out;
+$transition-colors: color $duration-fast $ease-out,
+  background-color $duration-fast $ease-out,
+  border-color $duration-fast $ease-out;
+$transition-transform: transform $duration-normal $ease-out;
+$transition-opacity: opacity $duration-normal $ease-out;
+$transition-shadow: box-shadow $duration-normal $ease-out;
+
+// Legacy (para compatibilidade)
+$transition: $transition-normal;
+
+$breakpoint-xs: 480px;
 $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
 $breakpoint-2xl: 1536px;
 
+// Container max widths
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1536px;
+
+$z-base: 0;
 $z-dropdown: 1000;
 $z-sticky: 1020;
 $z-fixed: 1030;
@@ -92,3 +276,30 @@ $z-modal-backdrop: 1040;
 $z-modal: 1050;
 $z-popover: 1060;
 $z-tooltip: 1070;
+$z-toast: 1080;
+
+// Input
+$input-height: 2.75rem; // 44px
+$input-height-sm: 2.25rem; // 36px
+$input-height-lg: 3.25rem; // 52px
+$input-padding-x: $spacing-4;
+$input-padding-y: $spacing-3;
+$input-border-radius: $border-radius-md;
+
+// Button
+$button-height: 2.5rem; // 40px
+$button-height-sm: 2rem; // 32px
+$button-height-lg: 3rem; // 48px
+$button-padding-x: $spacing-6;
+$button-padding-y: $spacing-3;
+$button-border-radius: $border-radius-md;
+
+// Card
+$card-padding: $spacing-6;
+$card-border-radius: $border-radius-lg;
+
+// Avatar
+$avatar-size-sm: 2rem; // 32px
+$avatar-size-md: 2.5rem; // 40px
+$avatar-size-lg: 3rem; // 48px
+$avatar-size-xl: 4rem; // 64px

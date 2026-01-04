@@ -1,37 +1,84 @@
 <script setup lang="ts">
-/**
- * UserFilters - Componente de filtros para lista de usuários
- * Implementa debounce com VueUse para otimização de buscas em grandes volumes
- */
 import { ref, computed } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import type { UserFilters } from '@/stores/userStore';
 
+/**
+ * Interface para props do componente
+ * @interface Props
+ * @property {boolean} loading - Se o componente está carregando
+ */
 interface Props {
-  /** Indica se está carregando dados */
   loading?: boolean;
 }
 
+/**
+ * Interface para emits do componente
+ * @interface Emits
+ * @event filter - Evento para filtrar usuários
+ * @event clear - Evento para limpar filtros
+ */
 interface Emits {
   (e: 'filter', filters: UserFilters): void;
   (e: 'clear'): void;
 }
 
+/**
+ * Define os valores padrão para os props do componente
+ * @function withDefaults
+ * @param {Props} defineProps - Props do componente
+ * @returns {Props} Valores padrão para os props do componente
+ */
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
 });
 
+/**
+ * Define os emits do componente
+ * @function defineEmits
+ * @returns {Emits} Emits do componente
+ */
 const emit = defineEmits<Emits>();
 
+/**
+ * Define o nome do usuário
+ * @function name
+ * @returns {string} Nome do usuário
+ */
 const name = ref('');
+
+/**
+ * Define o CPF do usuário
+ * @function cpf
+ * @returns {string} CPF do usuário
+ */
 const cpf = ref('');
+
+/**
+ * Define se o usuário está digitando
+ * @function isTyping
+ * @returns {boolean} Se o usuário está digitando
+ */
 const isTyping = ref(false);
 
-/** Indica se está em processo de busca (digitando ou carregando) */
+/**
+ * Define se o usuário está buscando
+ * @function isSearching
+ * @returns {boolean} Se o usuário está buscando
+ */
 const isSearching = computed(() => isTyping.value || props.loading);
 
 /**
- * Emite o filtro após debounce
+ * Define se o usuário tem filtros
+ * @function hasFilters
+ * @returns {boolean} Se o usuário tem filtros
+ */
+const hasFilters = computed(() => Boolean(name.value || cpf.value));
+
+/**
+ * Emite o filtro de usuários
+ * @function emitFilter
+ * @returns {void}
  */
 function emitFilter(): void {
   isTyping.value = false;
@@ -42,13 +89,18 @@ function emitFilter(): void {
 }
 
 /**
- * Debounce de 400ms para evitar requisições excessivas
- * Usa useDebounceFn do VueUse para código mais limpo
+ * Define o debounce para a busca de usuários
+ * @function debouncedFilter
+ * @param {Function} emitFilter - Função para emitir o filtro
+ * @param {number} delay - Tempo de debounce
+ * @returns {Function} Função debounce
  */
 const debouncedFilter = useDebounceFn(emitFilter, 400);
 
 /**
- * Dispara busca com indicador de digitação
+ * Triggera a busca de usuários
+ * @function triggerSearch
+ * @returns {void}
  */
 function triggerSearch(): void {
   isTyping.value = true;
@@ -56,7 +108,10 @@ function triggerSearch(): void {
 }
 
 /**
- * Handler para input de nome
+ * Evento de input para o nome do usuário
+ * @function onNameInput
+ * @param {Event} event - Evento de input
+ * @returns {void}
  */
 function onNameInput(event: Event): void {
   const input = event.target as HTMLInputElement;
@@ -65,7 +120,10 @@ function onNameInput(event: Event): void {
 }
 
 /**
- * Formata CPF enquanto digita
+ * Formata o CPF do usuário
+ * @function formatCpf
+ * @param {Event} event - Evento de input
+ * @returns {void}
  */
 function formatCpf(event: Event): void {
   const input = event.target as HTMLInputElement;
@@ -88,7 +146,9 @@ function formatCpf(event: Event): void {
 }
 
 /**
- * Limpa todos os filtros
+ * Limpa os filtros de usuários
+ * @function clearFilters
+ * @returns {void}
  */
 function clearFilters(): void {
   name.value = '';
@@ -102,49 +162,46 @@ function clearFilters(): void {
   <div class="user-filters">
     <div class="user-filters__fields">
       <div class="user-filters__field">
-        <label for="filter-name">Nome</label>
+        <label for="filter-name" class="user-filters__label">
+          Nome
+        </label>
         <div class="user-filters__input-wrapper">
-          <input
-            id="filter-name"
-            :value="name"
-            @input="onNameInput"
-            type="text"
-            placeholder="Buscar por nome..."
-            :class="{ 'is-searching': isSearching }"
-          />
-          <span v-if="isSearching && name" class="user-filters__spinner" aria-label="Buscando..."></span>
+          <input id="filter-name" :value="name" @input="onNameInput" type="text" placeholder="Buscar por nome..."
+            class="user-filters__input" :class="{ 'is-active': name }" autocomplete="off" />
+          <span v-if="isSearching && name" class="user-filters__spinner" aria-label="Buscando..." />
         </div>
       </div>
 
       <div class="user-filters__field">
-        <label for="filter-cpf">CPF</label>
+        <label for="filter-cpf" class="user-filters__label">
+          CPF
+        </label>
         <div class="user-filters__input-wrapper">
-          <input
-            id="filter-cpf"
-            :value="cpf"
-            @input="formatCpf"
-            type="text"
-            placeholder="000.000.000-00"
-            maxlength="14"
-            :class="{ 'is-searching': isSearching }"
-          />
-          <span v-if="isSearching && cpf" class="user-filters__spinner" aria-label="Buscando..."></span>
+          <input id="filter-cpf" :value="cpf" @input="formatCpf" type="text" placeholder="000.000.000-00" maxlength="14"
+            class="user-filters__input" :class="{ 'is-active': cpf }" autocomplete="off" />
+          <span v-if="isSearching && cpf" class="user-filters__spinner" aria-label="Buscando..." />
         </div>
       </div>
 
       <div class="user-filters__actions">
-        <span v-if="isSearching" class="user-filters__status">
-          Buscando...
-        </span>
-        <button
-          v-if="name || cpf"
-          class="btn btn--secondary user-filters__clear"
-          @click="clearFilters"
-          type="button"
-          :disabled="isSearching"
-        >
-          Limpar
-        </button>
+        <Transition name="fade">
+          <span v-if="isSearching" class="user-filters__status">
+            <span class="user-filters__status-dot" />
+            Buscando...
+          </span>
+        </Transition>
+
+        <Transition name="scale">
+          <button v-if="hasFilters" class="btn btn--secondary btn--sm user-filters__clear" @click="clearFilters"
+            type="button" :disabled="isSearching">
+            <svg class="user-filters__clear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            Limpar
+          </button>
+        </Transition>
       </div>
     </div>
   </div>
@@ -156,6 +213,10 @@ function clearFilters(): void {
 
 .user-filters {
   margin-bottom: $spacing-6;
+  padding: $spacing-4;
+  background: var(--bg-secondary);
+  border-radius: $border-radius-lg;
+  border: 1px solid var(--border-color);
 
   &__fields {
     display: flex;
@@ -172,37 +233,38 @@ function clearFilters(): void {
   &__field {
     flex: 1;
     min-width: 200px;
+  }
 
-    label {
-      display: block;
-      margin-bottom: $spacing-2;
-      font-size: $font-size-sm;
-      color: $color-subtext;
-    }
-
-    input {
-      width: 100%;
-      transition: border-color 0.2s ease;
-
-      &.is-searching {
-        border-color: $color-mauve;
-      }
-    }
+  &__label {
+    display: block;
+    margin-bottom: $spacing-2;
+    font-size: var(--font-size-sm);
+    font-weight: $font-weight-medium;
+    color: var(--color-subtext);
   }
 
   &__input-wrapper {
     position: relative;
   }
 
+  &__input {
+    width: 100%;
+    @include transition(border-color, $duration-fast);
+
+    &.is-active {
+      border-color: var(--color-lavender);
+    }
+  }
+
   &__spinner {
     position: absolute;
-    right: 12px;
+    right: $spacing-3;
     top: 50%;
     transform: translateY(-50%);
     width: 16px;
     height: 16px;
     border: 2px solid transparent;
-    border-top-color: $color-mauve;
+    border-top-color: var(--color-lavender);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -212,35 +274,57 @@ function clearFilters(): void {
     align-items: center;
     gap: $spacing-3;
     flex-shrink: 0;
+    height: $input-height;
+
+    @include mobile {
+      justify-content: space-between;
+    }
   }
 
   &__status {
-    font-size: $font-size-sm;
-    color: $color-mauve;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: var(--font-size-sm);
+    color: var(--color-lavender);
+  }
+
+  &__status-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-lavender);
+    border-radius: 50%;
     animation: pulse 1.5s ease-in-out infinite;
   }
 
   &__clear {
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    gap: $spacing-1;
+  }
+
+  &__clear-icon {
+    width: 14px;
+    height: 14px;
   }
 }
 
-@keyframes spin {
-  to {
-    transform: translateY(-50%) rotate(360deg);
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $duration-fast $ease-out;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.scale-enter-active,
+.scale-leave-active {
+  transition: all $duration-fast $ease-bounce;
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
 }
 </style>
-

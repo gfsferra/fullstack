@@ -4,24 +4,249 @@
 *,
 *::before,
 *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+
+  @include reduced-motion {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   font-family: $font-primary;
-  font-size: $font-size-base;
+  font-size: var(--font-size-base);
+  font-weight: $font-weight-normal;
   line-height: $line-height-normal;
-  color: $color-text;
-  background: $bg-primary;
+  color: var(--color-text);
+  background: var(--bg-primary);
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
   @include scrollbar;
+  @include selection;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-lavender);
+    outline-offset: 2px;
+  }
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+img {
+  font-style: italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+}
+
+button {
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+input,
+textarea {
+  &::placeholder {
+    color: var(--color-subtext);
+    opacity: 0.7;
+  }
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+input[type="search"] {
+
+  &::-webkit-search-decoration,
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-results-button,
+  &::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+[tabindex]:not([tabindex="-1"]) {
+  touch-action: manipulation;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+button,
+[role="button"] {
+  user-select: none;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: $spacing-6 0;
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: $font-primary;
+  font-size: 0.875em;
+}
+
+pre {
+  overflow-x: auto;
+  @include scrollbar;
+}
+
+blockquote {
+  border-left: 4px solid var(--color-lavender);
+  padding-left: $spacing-4;
+  margin-left: 0;
+  font-style: italic;
+  color: var(--color-subtext);
+}
+
+strong,
+b {
+  font-weight: $font-weight-bold;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+small {
+  font-size: 0.875em;
+}
+
+mark {
+  background: var(--color-yellow);
+  color: var(--color-base);
+  padding: 0.125em 0.25em;
+  border-radius: $border-radius-sm;
+}
+
+dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: $border-radius-lg;
+  padding: 0;
+  max-width: 90vw;
+  max-height: 90vh;
+
+  &::backdrop {
+    background: rgba($color-base-raw, 0.8);
+    backdrop-filter: blur(4px);
+  }
+}
+
+details {
+  summary {
+    cursor: pointer;
+    user-select: none;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-lavender);
+      outline-offset: 2px;
+    }
+  }
+}
+
+progress {
+  vertical-align: baseline;
+  appearance: none;
+  height: 8px;
+  border-radius: $border-radius-full;
+  overflow: hidden;
+  background: var(--bg-secondary);
+
+  &::-webkit-progress-bar {
+    background: var(--bg-secondary);
+    border-radius: $border-radius-full;
+  }
+
+  &::-webkit-progress-value {
+    background: var(--gradient-primary);
+    border-radius: $border-radius-full;
+  }
+
+  &::-moz-progress-bar {
+    background: var(--gradient-primary);
+    border-radius: $border-radius-full;
+  }
 }

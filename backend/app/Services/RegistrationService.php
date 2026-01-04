@@ -71,7 +71,6 @@ class RegistrationService
             throw new \Exception('Usuário não encontrado.');
         }
 
-        // Atualiza os dados do usuário
         $user = $this->userRepository->update($userId, [
             'name' => $data['name'],
             'birth_date' => $data['birth_date'],
@@ -79,7 +78,6 @@ class RegistrationService
             'registration_completed' => true,
         ]);
 
-        // Obtém o e-mail do token Google se disponível
         $email = $this->getEmailForNotification($user);
 
         Log::info('Disparando job de envio de e-mail', [
@@ -87,7 +85,6 @@ class RegistrationService
             'email' => $email,
         ]);
 
-        // Dispara o job de envio de e-mail de forma assíncrona
         SendRegistrationEmail::dispatch($user, $email);
 
         Log::info('Job de e-mail disparado com sucesso', [
@@ -108,7 +105,6 @@ class RegistrationService
      */
     protected function getEmailForNotification(User $user): string
     {
-        // Usa o método com refresh automático
         return $this->googleService->getEmailWithAutoRefresh($user);
     }
 
@@ -145,7 +141,6 @@ class RegistrationService
      */
     protected function validateRegistrationData(array $data, int $userId): void
     {
-        // Remove formatação do CPF para validação de unicidade
         $cpfClean = isset($data['cpf']) ? preg_replace('/[^0-9]/', '', $data['cpf']) : '';
 
         $rules = [
@@ -167,15 +162,12 @@ class RegistrationService
 
         $validator = Validator::make($data, $rules, $messages);
 
-        // Validação customizada para CPF (validação matemática + unicidade)
         $validator->after(function ($validator) use ($cpfClean, $userId) {
-            // Validação matemática do CPF
             if (!$this->validateCpf($cpfClean)) {
                 $validator->errors()->add('cpf', 'O CPF informado é inválido.');
                 return;
             }
 
-            // Verifica unicidade
             $existingUser = User::where('cpf', $cpfClean)
                 ->where('id', '!=', $userId)
                 ->first();
@@ -198,20 +190,16 @@ class RegistrationService
      */
     public function validateCpf(string $cpf): bool
     {
-        // Remove caracteres não numéricos
         $cpf = preg_replace('/[^0-9]/', '', $cpf);
 
-        // Verifica se tem 11 dígitos
         if (strlen($cpf) !== 11) {
             return false;
         }
 
-        // Verifica se todos os dígitos são iguais
         if (preg_match('/^(\d)\1{10}$/', $cpf)) {
             return false;
         }
 
-        // Calcula o primeiro dígito verificador
         $sum = 0;
         for ($i = 0; $i < 9; $i++) {
             $sum += intval($cpf[$i]) * (10 - $i);
@@ -223,7 +211,6 @@ class RegistrationService
             return false;
         }
 
-        // Calcula o segundo dígito verificador
         $sum = 0;
         for ($i = 0; $i < 10; $i++) {
             $sum += intval($cpf[$i]) * (11 - $i);

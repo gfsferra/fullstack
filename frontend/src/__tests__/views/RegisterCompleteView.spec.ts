@@ -95,7 +95,7 @@ describe('RegisterCompleteView', () => {
     it('deve exibir hint no campo de e-mail', async () => {
       const wrapper = await mountComponent();
       
-      expect(wrapper.find('.form-group__hint').text()).toContain('E-mail da conta Google');
+      expect(wrapper.find('.form-group__hint').text()).toContain('vinculado à sua conta Google');
     });
   });
 
@@ -344,7 +344,7 @@ describe('RegisterCompleteView', () => {
       expect(wrapper.text()).toContain('Erro ao completar cadastro');
     });
 
-    it('deve exibir ícone de erro', async () => {
+    it('deve exibir ícone SVG de erro', async () => {
       vi.mocked(api.post).mockRejectedValue({
         response: { data: { message: 'Erro' } },
       });
@@ -358,10 +358,10 @@ describe('RegisterCompleteView', () => {
       
       await flushPromises();
       
-      expect(wrapper.find('.register-form__errors-icon').text()).toBe('⚠️');
+      expect(wrapper.find('.register-form__errors-icon').exists()).toBe(true);
     });
 
-    it('deve exibir título de erros', async () => {
+    it('deve exibir cabeçalho de erros', async () => {
       vi.mocked(api.post).mockRejectedValue({
         response: { data: { message: 'Erro' } },
       });
@@ -375,7 +375,7 @@ describe('RegisterCompleteView', () => {
       
       await flushPromises();
       
-      expect(wrapper.find('.register-form__errors-title').text()).toContain('Por favor, corrija');
+      expect(wrapper.find('.register-form__errors-header').text()).toContain('Por favor, corrija');
     });
 
     it('não deve exibir erros inicialmente', async () => {
@@ -402,4 +402,3 @@ describe('RegisterCompleteView', () => {
     });
   });
 });
-

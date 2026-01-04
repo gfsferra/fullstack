@@ -35,15 +35,15 @@ describe('UserList', () => {
       });
       
       expect(wrapper.find('.user-list__empty').exists()).toBe(true);
-      expect(wrapper.text()).toContain('Nenhum usuário cadastrado');
+      expect(wrapper.text()).toContain('Nenhum usuário encontrado');
     });
 
-    it('deve exibir emoji na mensagem vazia', () => {
+    it('deve exibir ícone SVG na mensagem vazia', () => {
       const wrapper = mount(UserList, {
         props: { users: [] },
       });
       
-      expect(wrapper.find('.user-list__empty-icon').text()).toBe('👥');
+      expect(wrapper.find('.user-list__empty-icon').exists()).toBe(true);
     });
 
     it('não deve exibir tabela quando não há usuários', () => {
@@ -112,7 +112,7 @@ describe('UserList', () => {
       expect(dateCell.text()).toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
     });
 
-    it('deve exibir "-" quando data de nascimento não existe', () => {
+    it('deve exibir "—" quando data de nascimento não existe', () => {
       const usersWithoutDate: User[] = [{
         ...mockUsers[0],
         birth_date: undefined,
@@ -123,10 +123,10 @@ describe('UserList', () => {
       });
       
       const cells = wrapper.findAll('tbody td');
-      expect(cells[2].text()).toBe('-');
+      expect(cells[2].text()).toBe('—');
     });
 
-    it('deve exibir "-" quando idade não existe', () => {
+    it('deve exibir "—" quando idade não existe', () => {
       const usersWithoutAge: User[] = [{
         ...mockUsers[0],
         age: undefined,
@@ -137,10 +137,10 @@ describe('UserList', () => {
       });
       
       const cells = wrapper.findAll('tbody td');
-      expect(cells[3].text()).toBe('-');
+      expect(cells[3].text()).toBe('—');
     });
 
-    it('deve exibir "-" quando CPF não existe', () => {
+    it('deve exibir "—" quando CPF não existe', () => {
       const usersWithoutCpf: User[] = [{
         ...mockUsers[0],
         cpf: undefined,
@@ -151,7 +151,7 @@ describe('UserList', () => {
       });
       
       const cells = wrapper.findAll('tbody td');
-      expect(cells[4].text()).toBe('-');
+      expect(cells[4].text()).toBe('—');
     });
 
     it('deve ter classe de animação nas linhas', () => {
@@ -161,9 +161,34 @@ describe('UserList', () => {
       
       const rows = wrapper.findAll('tbody tr');
       rows.forEach(row => {
-        expect(row.classes()).toContain('animate-fade-in');
+        expect(row.classes()).toContain('user-list__row');
       });
+    });
+    
+    it('deve exibir placeholder com iniciais quando não há avatar', () => {
+      const wrapper = mount(UserList, {
+        props: { users: mockUsers },
+      });
+      
+      const placeholders = wrapper.findAll('.user-list__avatar--placeholder');
+      expect(placeholders).toHaveLength(2);
+      expect(placeholders[0].text()).toBe('J');
+      expect(placeholders[1].text()).toBe('M');
+    });
+    
+    it('deve exibir imagem do avatar quando disponível', () => {
+      const usersWithAvatar: User[] = [{
+        ...mockUsers[0],
+        avatar: 'https://example.com/avatar.jpg',
+      }];
+      
+      const wrapper = mount(UserList, {
+        props: { users: usersWithAvatar },
+      });
+      
+      const avatarImg = wrapper.find('.user-list__avatar--image');
+      expect(avatarImg.exists()).toBe(true);
+      expect(avatarImg.attributes('src')).toBe('https://example.com/avatar.jpg');
     });
   });
 });
-

@@ -52,13 +52,14 @@ describe('HomeView', () => {
     it('deve renderizar o título corretamente', async () => {
       const wrapper = await mountComponent();
       
-      expect(wrapper.find('.home__title').text()).toContain('Cadastro de Usuários');
+      expect(wrapper.find('.home__title').text()).toContain('Cadastro de');
+      expect(wrapper.find('.home__title').text()).toContain('Usuários');
     });
 
-    it('deve exibir emoji no título', async () => {
+    it('deve exibir badge de sistema', async () => {
       const wrapper = await mountComponent();
       
-      expect(wrapper.find('.home__emoji').text()).toBe('📋');
+      expect(wrapper.find('.home__badge').text()).toContain('Sistema de Cadastro');
     });
 
     it('deve exibir subtítulo', async () => {
@@ -88,29 +89,36 @@ describe('HomeView', () => {
       expect(cards).toHaveLength(3);
     });
 
-    it('deve exibir card de Login Seguro', async () => {
+    it('deve exibir card de Login Seguro com ícone SVG', async () => {
       const wrapper = await mountComponent();
       
       const cards = wrapper.findAll('.feature-card');
-      expect(cards[0].find('.feature-card__icon').text()).toBe('🔐');
+      expect(cards[0].find('.feature-card__icon').exists()).toBe(true);
       expect(cards[0].find('.feature-card__title').text()).toBe('Login Seguro');
       expect(cards[0].find('.feature-card__description').text()).toContain('OAuth 2.0');
     });
 
-    it('deve exibir card de Lista de Usuários', async () => {
+    it('deve exibir card de Gestão de Usuários com ícone SVG', async () => {
       const wrapper = await mountComponent();
       
       const cards = wrapper.findAll('.feature-card');
-      expect(cards[1].find('.feature-card__icon').text()).toBe('👥');
-      expect(cards[1].find('.feature-card__title').text()).toBe('Lista de Usuários');
+      expect(cards[1].find('.feature-card__icon').exists()).toBe(true);
+      expect(cards[1].find('.feature-card__title').text()).toBe('Gestão de Usuários');
     });
 
-    it('deve exibir card de Confirmação por E-mail', async () => {
+    it('deve exibir card de Notificações com ícone SVG', async () => {
       const wrapper = await mountComponent();
       
       const cards = wrapper.findAll('.feature-card');
-      expect(cards[2].find('.feature-card__icon').text()).toBe('📧');
-      expect(cards[2].find('.feature-card__title').text()).toBe('Confirmação por E-mail');
+      expect(cards[2].find('.feature-card__icon').exists()).toBe(true);
+      expect(cards[2].find('.feature-card__title').text()).toBe('Notificações');
+    });
+    
+    it('deve ter ícones wrapper para todos os cards', async () => {
+      const wrapper = await mountComponent();
+      
+      const iconWrappers = wrapper.findAll('.feature-card__icon-wrapper');
+      expect(iconWrappers).toHaveLength(3);
     });
   });
 
@@ -181,4 +189,3 @@ describe('HomeView', () => {
     });
   });
 });
-

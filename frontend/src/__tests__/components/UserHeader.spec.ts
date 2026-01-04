@@ -23,12 +23,12 @@ describe('UserHeader', () => {
     expect(wrapper.find('.user-header__title').text()).toContain('Cadastro de Usuários');
   });
 
-  it('deve exibir emoji no título', () => {
+  it('deve exibir ícone SVG do logo', () => {
     const wrapper = mount(UserHeader, {
       props: { user: mockUser },
     });
     
-    expect(wrapper.find('.user-header__emoji').text()).toBe('📋');
+    expect(wrapper.find('.user-header__logo').exists()).toBe(true);
   });
 
   it('deve exibir informações do usuário quando logado', () => {
@@ -50,7 +50,7 @@ describe('UserHeader', () => {
     expect(avatar.attributes('alt')).toBe(mockUser.name);
   });
 
-  it('não deve exibir avatar quando não existe', () => {
+  it('deve exibir avatar placeholder quando não existe imagem', () => {
     const userWithoutAvatar: AuthUser = {
       ...mockUser,
       avatar: undefined,
@@ -60,7 +60,9 @@ describe('UserHeader', () => {
       props: { user: userWithoutAvatar },
     });
     
-    expect(wrapper.find('.user-header__avatar').exists()).toBe(false);
+    const placeholder = wrapper.find('.user-header__avatar--placeholder');
+    expect(placeholder.exists()).toBe(true);
+    expect(placeholder.text()).toBe('J');
   });
 
   it('não deve exibir informações do usuário quando null', () => {
@@ -78,7 +80,7 @@ describe('UserHeader', () => {
     
     const logoutBtn = wrapper.find('button');
     expect(logoutBtn.exists()).toBe(true);
-    expect(logoutBtn.text()).toBe('Sair');
+    expect(logoutBtn.text()).toContain('Sair');
   });
 
   it('deve emitir evento logout ao clicar no botão', async () => {
@@ -100,5 +102,12 @@ describe('UserHeader', () => {
     const avatar = wrapper.find('.user-header__avatar');
     expect(avatar.attributes('referrerpolicy')).toBe('no-referrer');
   });
+  
+  it('deve exibir ícone SVG de logout', () => {
+    const wrapper = mount(UserHeader, {
+      props: { user: mockUser },
+    });
+    
+    expect(wrapper.find('.user-header__logout-icon').exists()).toBe(true);
+  });
 });
-

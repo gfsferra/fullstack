@@ -1,14 +1,27 @@
 <script setup lang="ts">
-/**
- * AuthCallbackView - Processa callback do Google OAuth
- */
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 
+/**
+ * Define o router
+ * @function useRouter
+ * @returns {Router} Router
+ */
 const router = useRouter();
+
+/**
+ * Define o store de autenticação
+ * @function useAuthStore
+ * @returns {AuthStore} Store de autenticação
+ */
 const authStore = useAuthStore();
 
+/**
+ * Gerencia o callback de autenticação
+ * @function onMounted
+ * @returns {void}
+ */
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const success = urlParams.get('success');
@@ -24,7 +37,6 @@ onMounted(() => {
 
     authStore.setUser(user);
 
-    // Redireciona baseado no status do cadastro
     if (user.registration_completed) {
       router.push('/users');
     } else {

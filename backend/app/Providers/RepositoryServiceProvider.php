@@ -41,14 +41,4 @@ class RepositoryServiceProvider extends ServiceProvider
             $this->app->bind($abstract, $concrete);
         }
     }
-
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot(): void
-    {
-        //
-    }
 }

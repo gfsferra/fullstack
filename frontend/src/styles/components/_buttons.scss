@@ -3,27 +3,253 @@
 
 .btn {
   @include button-base;
-  
+
   &--primary {
     @include button-primary;
   }
-  
+
   &--secondary {
     @include button-secondary;
   }
-  
+
+  &--ghost {
+    @include button-ghost;
+  }
+
   &--danger {
     @include button-danger;
   }
-  
-  &--sm {
-    padding: $spacing-2 $spacing-4;
-    font-size: $font-size-xs;
+
+  &--success {
+    @include button-base;
+    background: var(--color-success);
+    color: $color-base-raw;
+
+    @include hover-supported {
+      &:hover:not(:disabled) {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+    }
   }
-  
+
+  &--warning {
+    @include button-base;
+    background: var(--color-warning);
+    color: $color-base-raw;
+
+    @include hover-supported {
+      &:hover:not(:disabled) {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  &--outline-primary {
+    @include button-base;
+    background: transparent;
+    color: var(--color-lavender);
+    border: $border-width-2 solid var(--color-lavender);
+
+    @include hover-supported {
+      &:hover:not(:disabled) {
+        background: var(--color-lavender);
+        color: $color-base-raw;
+      }
+    }
+  }
+
+  &--outline-danger {
+    @include button-base;
+    background: transparent;
+    color: var(--color-error);
+    border: $border-width-2 solid var(--color-error);
+
+    @include hover-supported {
+      &:hover:not(:disabled) {
+        background: var(--color-error);
+        color: $color-base-raw;
+      }
+    }
+  }
+
+  &--sm {
+    height: $button-height-sm;
+    padding: $spacing-2 $spacing-4;
+    font-size: var(--font-size-xs);
+    gap: $spacing-1;
+  }
+
   &--lg {
+    height: $button-height-lg;
     padding: $spacing-4 $spacing-8;
-    font-size: $font-size-base;
+    font-size: var(--font-size-base);
+    gap: $spacing-3;
+  }
+
+  &--xl {
+    height: 3.5rem;
+    padding: $spacing-5 $spacing-10;
+    font-size: var(--font-size-lg);
+    border-radius: $border-radius-lg;
+  }
+
+  &--rounded {
+    border-radius: $border-radius-full;
+  }
+
+  &--square {
+    border-radius: 0;
+  }
+
+  &--icon {
+    width: $button-height;
+    height: $button-height;
+    padding: 0;
+    border-radius: $border-radius-md;
+
+    &.btn--sm {
+      width: $button-height-sm;
+      height: $button-height-sm;
+    }
+
+    &.btn--lg {
+      width: $button-height-lg;
+      height: $button-height-lg;
+    }
+  }
+
+  &--icon-rounded {
+    width: $button-height;
+    height: $button-height;
+    padding: 0;
+    border-radius: $border-radius-full;
+
+    &.btn--sm {
+      width: $button-height-sm;
+      height: $button-height-sm;
+    }
+
+    &.btn--lg {
+      width: $button-height-lg;
+      height: $button-height-lg;
+    }
+  }
+
+  &--block {
+    width: 100%;
+  }
+
+  &--fit {
+    width: fit-content;
+  }
+
+  &--loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+  }
+
+  svg,
+  .icon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+  }
+
+  &--icon-only-mobile {
+    @include mobile {
+      width: $button-height;
+      padding: 0;
+
+      span:not(.icon) {
+        @include visually-hidden;
+      }
+    }
   }
 }
 
+.btn-group {
+  display: inline-flex;
+
+  .btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-top-left-radius: $border-radius-md;
+      border-bottom-left-radius: $border-radius-md;
+    }
+
+    &:last-child {
+      border-top-right-radius: $border-radius-md;
+      border-bottom-right-radius: $border-radius-md;
+    }
+
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+  }
+
+  &--vertical {
+    flex-direction: column;
+
+    .btn {
+      &:first-child {
+        border-radius: 0;
+        border-top-left-radius: $border-radius-md;
+        border-top-right-radius: $border-radius-md;
+      }
+
+      &:last-child {
+        border-radius: 0;
+        border-bottom-left-radius: $border-radius-md;
+        border-bottom-right-radius: $border-radius-md;
+      }
+
+      &:not(:first-child) {
+        margin-left: 0;
+        margin-top: -1px;
+      }
+    }
+  }
+}
+
+.fab {
+  @include button-primary;
+  position: fixed;
+  bottom: $spacing-6;
+  right: $spacing-6;
+  width: 56px;
+  height: 56px;
+  border-radius: $border-radius-full;
+  box-shadow: var(--shadow-lg);
+  z-index: $z-fixed;
+
+  @include hover-supported {
+    &:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: var(--shadow-xl), var(--shadow-glow);
+    }
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}

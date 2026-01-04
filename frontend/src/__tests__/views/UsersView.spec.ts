@@ -44,6 +44,14 @@ vi.mock('@/components/users/UserPagination.vue', () => ({
   },
 }));
 
+vi.mock('@/components/ui/TableSkeleton.vue', () => ({
+  default: {
+    name: 'TableSkeleton',
+    props: ['rows', 'columns'],
+    template: '<div class="table-skeleton-mock"></div>',
+  },
+}));
+
 // Mock do api
 vi.mock('@/services/api', () => ({
   default: {
@@ -127,11 +135,11 @@ describe('UsersView', () => {
       expect(wrapper.find('.card__title').text()).toBe('Usuários Cadastrados');
     });
 
-    it('deve exibir contagem de usuários', async () => {
+    it('deve exibir estatísticas de usuários', async () => {
       const wrapper = mountComponent();
       await flushPromises();
       
-      expect(wrapper.find('.users-view__count').text()).toContain('45 usuário(s)');
+      expect(wrapper.find('.users-view__stat-value').text()).toBe('45');
     });
   });
 
@@ -155,10 +163,9 @@ describe('UsersView', () => {
       await wrapper.vm.$nextTick();
       
       expect(wrapper.find('.users-view__loading').exists()).toBe(true);
-      expect(wrapper.find('.loading-spinner').exists()).toBe(true);
     });
 
-    it('deve exibir texto de carregamento', async () => {
+    it('deve exibir skeleton de tabela durante carregamento', async () => {
       vi.mocked(api.get).mockImplementation(() => new Promise(() => {}));
       
       const wrapper = mountComponent();
@@ -168,7 +175,7 @@ describe('UsersView', () => {
       userStore.loading = true;
       await wrapper.vm.$nextTick();
       
-      expect(wrapper.text()).toContain('Carregando usuários...');
+      expect(wrapper.findComponent({ name: 'TableSkeleton' }).exists()).toBe(true);
     });
 
     it('deve exibir lista após carregar', async () => {
@@ -319,10 +326,10 @@ describe('UsersView', () => {
       expect(wrapper.find('.users-view').exists()).toBe(true);
     });
 
-    it('deve ter section list-section', () => {
+    it('deve ter section com classe correta', () => {
       const wrapper = mountComponent();
       
-      expect(wrapper.find('.users-view__list-section').exists()).toBe(true);
+      expect(wrapper.find('.users-view__section').exists()).toBe(true);
     });
 
     it('deve ter card wrapper', () => {
@@ -331,10 +338,10 @@ describe('UsersView', () => {
       expect(wrapper.find('.card').exists()).toBe(true);
     });
 
-    it('deve ter header com flex-between', () => {
+    it('deve ter card header', () => {
       const wrapper = mountComponent();
       
-      expect(wrapper.find('.card__header.flex-between').exists()).toBe(true);
+      expect(wrapper.find('.card__header').exists()).toBe(true);
     });
   });
 });

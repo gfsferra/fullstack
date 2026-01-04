@@ -13,7 +13,6 @@ Route::prefix('auth/google')->group(function () {
     Route::get('redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
     Route::get('callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 });
-
 Route::get('auth/user', [GoogleAuthController::class, 'user'])->name('auth.user');
 Route::post('auth/logout', [GoogleAuthController::class, 'logout'])->name('auth.logout');
 

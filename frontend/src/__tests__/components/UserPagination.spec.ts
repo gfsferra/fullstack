@@ -38,8 +38,7 @@ describe('UserPagination', () => {
         props: defaultProps,
       });
       
-      expect(wrapper.find('.pagination__info').text()).toContain('Página 3 de 10');
-      expect(wrapper.find('.pagination__info').text()).toContain('150 usuários');
+      expect(wrapper.find('.pagination__info').text()).toContain('de 150 usuários');
     });
   });
 
