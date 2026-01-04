@@ -1,0 +1,47 @@
+meta {
+  name: Health Check
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # Health Check
+  
+  Verifica o status de saúde da API e seus serviços.
+  
+  ## Resposta - Healthy (200)
+  
+  ```json
+  {
+    "status": "ok",
+    "timestamp": "2026-01-04T19:32:32+00:00",
+    "services": {
+      "database": { "status": "ok", "connection": "mysql" },
+      "redis": { "status": "ok" },
+      "queue": { "status": "ok", "pending_jobs": 0 }
+    }
+  }
+  ```
+  
+  ## Resposta - Degraded (503)
+  
+  ```json
+  {
+    "status": "degraded",
+    "services": {
+      "database": { "status": "error", "message": "Database connection failed" }
+    }
+  }
+  ```
+}
+

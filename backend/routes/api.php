@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\RegistrationController;
 use Illuminate\Support\Facades\Route;
+
+// API Info & Health Check
+Route::get('/', [ApiController::class, 'info'])->name('api.info');
+Route::get('/health', [ApiController::class, 'health'])->name('api.health');
 
 // User CRUD routes
 Route::apiResource('users', UserController::class);

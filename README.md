@@ -364,6 +364,13 @@ fullstack/
 
 ## 🔌 API Endpoints
 
+### Geral
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api` | Informações da API e lista de endpoints |
+| GET | `/api/health` | Health check (database, redis, queue) |
+
 ### Autenticação
 
 | Método | Endpoint | Descrição |
@@ -380,17 +387,34 @@ fullstack/
 | POST | `/api/registration/complete` | Completa cadastro |
 | GET | `/api/registration/status/{id}` | Status do cadastro |
 
-### Usuários
+### Usuários (CRUD)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | GET | `/api/users` | Lista usuários (paginado) |
 | GET | `/api/users/{id}` | Detalhes do usuário |
+| POST | `/api/users` | Criar usuário |
+| PUT | `/api/users/{id}` | Atualizar usuário |
+| DELETE | `/api/users/{id}` | Remover usuário |
 
 **Parâmetros de listagem:**
 
 ```
 GET /api/users?search=nome&per_page=10&page=1
+```
+
+**Exemplo de resposta do Health Check:**
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-04T19:32:32+00:00",
+  "services": {
+    "database": { "status": "ok", "connection": "mysql" },
+    "redis": { "status": "ok" },
+    "queue": { "status": "ok", "pending_jobs": 0 }
+  }
+}
 ```
 
 ---
@@ -414,6 +438,8 @@ npm install -g @usebruno/cli
 bruno/
 ├── bruno.json              # Configuração da coleção
 ├── collection.bru          # Headers globais
+├── api-info.bru            # Informações da API
+├── health.bru              # Health check
 ├── environments/
 │   └── local.bru           # Variáveis de ambiente (localhost)
 ├── auth/
