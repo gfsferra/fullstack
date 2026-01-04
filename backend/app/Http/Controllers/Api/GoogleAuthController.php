@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
@@ -26,6 +27,7 @@ class GoogleAuthController extends Controller
      * Redireciona o usuário para a página de autenticação do Google.
      *
      * Inicia o fluxo OAuth 2.0 redirecionando para o consent screen do Google.
+     * Solicita access_type=offline para obter refresh_token.
      *
      * @return RedirectResponse
      */
@@ -34,7 +36,10 @@ class GoogleAuthController extends Controller
         /** @var GoogleProvider $driver */
         $driver = Socialite::driver('google');
         
-        return $driver->stateless()->redirect();
+        return $driver
+            ->with(['access_type' => 'offline', 'prompt' => 'consent'])
+            ->stateless()
+            ->redirect();
     }
 
     /**
@@ -61,12 +66,25 @@ class GoogleAuthController extends Controller
 
             $existingUser = User::where('email', $googleUser->getEmail())->first();
 
+            // Calcular data de expiração do token
+            $expiresAt = isset($googleUser->expiresIn) 
+                ? Carbon::now()->addSeconds($googleUser->expiresIn)
+                : null;
+
             if ($existingUser) {
-                $existingUser->update([
+                $updateData = [
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'google_token' => $googleUser->token,
-                ]);
+                    'google_token_expires_at' => $expiresAt,
+                ];
+
+                // Só atualiza refresh_token se recebido (Google só envia no primeiro login)
+                if (!empty($googleUser->refreshToken)) {
+                    $updateData['google_refresh_token'] = $googleUser->refreshToken;
+                }
+
+                $existingUser->update($updateData);
                 $user = $existingUser;
             } else {
                 $user = User::create([
@@ -75,6 +93,8 @@ class GoogleAuthController extends Controller
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken ?? null,
+                    'google_token_expires_at' => $expiresAt,
                     'registration_completed' => false,
                 ]);
             }

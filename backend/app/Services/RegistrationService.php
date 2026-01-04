@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\SendRegistrationEmail;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -81,8 +82,17 @@ class RegistrationService
         // Obtém o e-mail do token Google se disponível
         $email = $this->getEmailForNotification($user);
 
+        Log::info('Disparando job de envio de e-mail', [
+            'user_id' => $user->id,
+            'email' => $email,
+        ]);
+
         // Dispara o job de envio de e-mail de forma assíncrona
         SendRegistrationEmail::dispatch($user, $email);
+
+        Log::info('Job de e-mail disparado com sucesso', [
+            'user_id' => $user->id,
+        ]);
 
         return $user;
     }
@@ -90,21 +100,16 @@ class RegistrationService
     /**
      * Obtém o e-mail para envio de notificação.
      *
-     * Tenta recuperar o e-mail do token Google, caso contrário usa o e-mail cadastrado.
+     * Utiliza refresh automático de token se necessário.
+     * Caso falhe, usa o e-mail cadastrado no sistema.
      *
      * @param User $user Usuário
      * @return string E-mail para notificação
      */
     protected function getEmailForNotification(User $user): string
     {
-        if ($user->google_token) {
-            $googleEmail = $this->googleService->getEmailFromToken($user->google_token);
-            if ($googleEmail) {
-                return $googleEmail;
-            }
-        }
-
-        return $user->email;
+        // Usa o método com refresh automático
+        return $this->googleService->getEmailWithAutoRefresh($user);
     }
 
     /**
@@ -151,20 +156,26 @@ class RegistrationService
 
         $messages = [
             'name.required' => 'O nome é obrigatório.',
+            'name.string' => 'O nome deve ser um texto válido.',
+            'name.max' => 'O nome não pode ter mais de 255 caracteres.',
             'birth_date.required' => 'A data de nascimento é obrigatória.',
+            'birth_date.date' => 'A data de nascimento deve estar no formato válido (dd/mm/aaaa).',
             'birth_date.before' => 'A data de nascimento deve ser anterior a hoje.',
             'cpf.required' => 'O CPF é obrigatório.',
+            'cpf.string' => 'O CPF deve ser um texto válido.',
         ];
 
         $validator = Validator::make($data, $rules, $messages);
 
-        // Validação customizada para CPF único (comparando CPF sem formatação)
+        // Validação customizada para CPF (validação matemática + unicidade)
         $validator->after(function ($validator) use ($cpfClean, $userId) {
-            if (strlen($cpfClean) !== 11) {
-                $validator->errors()->add('cpf', 'O CPF deve ter 11 dígitos.');
+            // Validação matemática do CPF
+            if (!$this->validateCpf($cpfClean)) {
+                $validator->errors()->add('cpf', 'O CPF informado é inválido.');
                 return;
             }
 
+            // Verifica unicidade
             $existingUser = User::where('cpf', $cpfClean)
                 ->where('id', '!=', $userId)
                 ->first();
@@ -223,4 +234,3 @@ class RegistrationService
         return intval($cpf[10]) === $digit2;
     }
 }
-

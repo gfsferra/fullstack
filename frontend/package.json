@@ -9,10 +9,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@types/node": "^25.0.3",
+    "@vueuse/core": "^14.1.0",
     "axios": "^1.13.2",
     "pinia": "^3.0.4",
     "sass": "^1.97.1",
@@ -21,9 +25,13 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
+    "happy-dom": "^20.0.11",
     "vite": "^7.3.0",
-    "vite-plugin-vue-devtools": "^8.0.5"
+    "vite-plugin-vue-devtools": "^8.0.5",
+    "vitest": "^4.0.16"
   }
 }

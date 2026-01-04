@@ -37,7 +37,7 @@ class RegistrationControllerTest extends TestCase
             'user_id' => $user->id,
             'name' => 'João da Silva',
             'birth_date' => '1990-01-15',
-            'cpf' => '123.456.789-00',
+            'cpf' => '529.982.247-25', // CPF válido matematicamente
         ];
 
         $response = $this->postJson('/api/registration/complete', $data);
@@ -71,7 +71,7 @@ class RegistrationControllerTest extends TestCase
             'user_id' => $user->id,
             'name' => 'Maria Silva',
             'birth_date' => '1985-06-20',
-            'cpf' => '987.654.321-00',
+            'cpf' => '123.456.789-09', // CPF válido matematicamente
         ];
 
         $this->postJson('/api/registration/complete', $data);
@@ -116,7 +116,7 @@ class RegistrationControllerTest extends TestCase
             'user_id' => $user->id,
             'name' => 'João da Silva',
             'birth_date' => now()->addDay()->format('Y-m-d'), // Data futura
-            'cpf' => '123.456.789-00',
+            'cpf' => '111.444.777-35', // CPF válido matematicamente
         ];
 
         $response = $this->postJson('/api/registration/complete', $data);
@@ -132,7 +132,8 @@ class RegistrationControllerTest extends TestCase
      */
     public function test_registration_validates_unique_cpf(): void
     {
-        User::factory()->create(['cpf' => '98765432100']);
+        // CPF válido: 123.456.789-09 (já cadastrado)
+        User::factory()->create(['cpf' => '12345678909']);
 
         $user = User::factory()->pending()->fromGoogle()->create();
 
@@ -140,13 +141,57 @@ class RegistrationControllerTest extends TestCase
             'user_id' => $user->id,
             'name' => 'João da Silva',
             'birth_date' => '1990-01-15',
-            'cpf' => '987.654.321-00',
+            'cpf' => '123.456.789-09', // Mesmo CPF formatado
         ];
 
         $response = $this->postJson('/api/registration/complete', $data);
 
         $response->assertStatus(422)
             ->assertJsonStructure(['errors' => ['cpf']]);
+    }
+
+    /**
+     * Testa validação matemática do CPF.
+     *
+     * @return void
+     */
+    public function test_registration_validates_cpf_mathematically(): void
+    {
+        $user = User::factory()->pending()->fromGoogle()->create();
+
+        $data = [
+            'user_id' => $user->id,
+            'name' => 'João da Silva',
+            'birth_date' => '1990-01-15',
+            'cpf' => '123.456.789-00', // CPF inválido matematicamente
+        ];
+
+        $response = $this->postJson('/api/registration/complete', $data);
+
+        $response->assertStatus(422)
+            ->assertJsonFragment(['cpf' => ['O CPF informado é inválido.']]);
+    }
+
+    /**
+     * Testa rejeição de CPFs com todos dígitos iguais.
+     *
+     * @return void
+     */
+    public function test_registration_rejects_cpf_with_same_digits(): void
+    {
+        $user = User::factory()->pending()->fromGoogle()->create();
+
+        $data = [
+            'user_id' => $user->id,
+            'name' => 'João da Silva',
+            'birth_date' => '1990-01-15',
+            'cpf' => '111.111.111-11',
+        ];
+
+        $response = $this->postJson('/api/registration/complete', $data);
+
+        $response->assertStatus(422)
+            ->assertJsonFragment(['cpf' => ['O CPF informado é inválido.']]);
     }
 
     /**

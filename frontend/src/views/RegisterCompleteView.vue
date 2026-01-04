@@ -18,7 +18,7 @@ const form = ref({
 });
 
 const loading = ref(false);
-const error = ref<string | null>(null);
+const errors = ref<string[]>([]);
 
 onMounted(() => {
   if (!authStore.isAuthenticated) {
@@ -87,7 +87,7 @@ async function handleSubmit(): Promise<void> {
   if (!authStore.user?.id) return;
 
   loading.value = true;
-  error.value = null;
+  errors.value = [];
 
   try {
     const payload: UserRegistrationComplete = {
@@ -113,9 +113,10 @@ async function handleSubmit(): Promise<void> {
   } catch (e: unknown) {
     const axiosError = e as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
     if (axiosError.response?.data?.errors) {
-      error.value = Object.values(axiosError.response.data.errors).flat().join(', ');
+      // Extrai todas as mensagens de erro em um array
+      errors.value = Object.values(axiosError.response.data.errors).flat();
     } else {
-      error.value = axiosError.response?.data?.message || 'Erro ao completar cadastro.';
+      errors.value = [axiosError.response?.data?.message || 'Erro ao completar cadastro.'];
     }
   } finally {
     loading.value = false;
@@ -165,8 +166,14 @@ async function handleSubmit(): Promise<void> {
               maxlength="14" />
           </div>
 
-          <div v-if="error" class="register-form__error">
-            {{ error }}
+          <div v-if="errors.length > 0" class="register-form__errors">
+            <div class="register-form__errors-title">
+              <span class="register-form__errors-icon">⚠️</span>
+              Por favor, corrija os seguintes erros:
+            </div>
+            <ul class="register-form__errors-list">
+              <li v-for="(err, index) in errors" :key="index">{{ err }}</li>
+            </ul>
           </div>
 
           <button type="submit" class="btn btn--primary register-form__submit" :disabled="loading">
@@ -203,19 +210,59 @@ async function handleSubmit(): Promise<void> {
   @include flex-column;
   gap: $spacing-5;
 
-  &__error {
+  &__errors {
     background: rgba($color-red, 0.1);
     border: 1px solid $color-red;
-    color: $color-red;
-    padding: $spacing-3 $spacing-4;
     border-radius: $border-radius-md;
+    padding: $spacing-4;
+    animation: shake 0.4s ease-in-out;
+  }
+
+  &__errors-title {
+    color: $color-red;
+    font-weight: 600;
     font-size: $font-size-sm;
+    margin-bottom: $spacing-2;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+  }
+
+  &__errors-icon {
+    font-size: $font-size-base;
+  }
+
+  &__errors-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      color: $color-red;
+      font-size: $font-size-sm;
+      padding: $spacing-1 0;
+      padding-left: $spacing-4;
+      position: relative;
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: $spacing-1;
+        color: $color-red;
+      }
+    }
   }
 
   &__submit {
     width: 100%;
     margin-top: $spacing-4;
   }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
 }
 
 .form-group {
